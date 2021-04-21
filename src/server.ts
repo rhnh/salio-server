@@ -1,9 +1,8 @@
 import { MongoClient } from "mongodb";
 import { DB_NAME, URI, DB_PORT } from "./utils/configs";
-import { /*setList, setListItem, setTaxonomies,*/ setUser } from "./models";
+import { setList, /*setListItem, setTaxonomies,*/ setUser } from "./models";
 import { Application } from "express";
 
-console.log(DB_NAME, URI, DB_PORT);
 const client = new MongoClient(URI, { useUnifiedTopology: true });
 export async function server(app: Application): Promise<void> {
   try {
@@ -26,7 +25,7 @@ export async function server(app: Application): Promise<void> {
     }
     try {
       setUser(client.db(DB_NAME).collection("users"));
-      // setList(client.db(DB_NAME).collection("lists"));
+      setList(client.db(DB_NAME).collection("lists"));
       // setListItem(client.db(DB_NAME).collection("lists"));
       // setTaxonomies(client.db(DB_NAME).collection("taxonomies"));
       app.listen(DB_PORT, () => {
