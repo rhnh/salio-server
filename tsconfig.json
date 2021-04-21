@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "src",
+    "strict": true,
+    "declaration": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "composite": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["./src/**/*.tsx", "./src/**/*.ts"]
+}
