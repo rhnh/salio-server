@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { validationResult } from "express-validator";
 import { addUser, findUser } from "../models/user-models";
 import { httpStatus } from "../utils/helpers";
 
@@ -7,6 +8,10 @@ export async function AddUserController(
   res: Response
 ): Promise<Response | void> {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const { username, password } = req.body;
     const userTaken = await findUser({ username, password });
     if (userTaken) {
