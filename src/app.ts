@@ -1,13 +1,13 @@
 import express from "express";
-import { Application } from "express";
-import * as routes from "./routes";
+import { Application, Response } from "express";
+import path from "path";
 import { setup } from "./setup";
 
 export const app: Application = express();
-setup(app);
+app.use(express.static(path.join(__dirname, "build")));
 
-//Routers
-app.use("/user", routes.userRouter);
-app.use("/taxonomy", routes.taxonomyRouter);
-app.use("/lists", routes.listRouter);
-app.use("/users", routes.userRouter);
+app.get("/", (_, res: Response) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+setup(app);
