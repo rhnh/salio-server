@@ -1,5 +1,6 @@
-import { Collection } from "mongodb";
+import { Collection, ObjectID } from "mongodb";
 import { IUser } from "../types";
+
 let users: Collection;
 
 export function setUser(collection: Collection): void {
@@ -9,25 +10,44 @@ export function setUser(collection: Collection): void {
 export async function addUser(user: IUser): Promise<boolean> {
   const { username, password } = user;
   try {
-    const newUser = await users.insertOne({ username, password });
+    const newUser = await users.insertOne({
+      username,
+      password,
+    });
     return newUser.result.n === 1;
   } catch (error) {
     return false;
   }
 }
 
-export async function findUser(user: IUser): Promise<IUser | null> {
+export async function findUserByUsername(
+  username: string
+): Promise<IUser | null> {
   try {
-    const { username, password } = user;
-    const isUser = await users.findOne({ username, password });
+    const isUser = await users.findOne({
+      username,
+    });
     return isUser || null;
   } catch (error) {
     return null;
   }
 }
-export async function findUserBy(id: string): Promise<IUser | null> {
+export async function findUser(user: IUser): Promise<IUser | null> {
   try {
-    const isUser = await users.findOne({ _id: id });
+    const { username, password } = user;
+
+    const isUser = await users.findOne({
+      username,
+      password,
+    });
+    return isUser || null;
+  } catch (error) {
+    return null;
+  }
+}
+export async function findUserById(id: string): Promise<IUser | null> {
+  try {
+    const isUser = await users.findOne({ _id: new ObjectID(id) });
     return isUser || null;
   } catch (error) {
     return null;

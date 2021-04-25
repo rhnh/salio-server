@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { addUser, findUser } from "../models/user-models";
+import { addUser, findUserByUsername } from "../models/user-models";
 import { httpStatus } from "../types";
 import { generatePassword } from "../utils/password";
 
@@ -15,10 +15,7 @@ export async function registerUser(
     }
     const { username, password } = req.body;
 
-    const usernameTaken = await findUser({
-      username,
-      password: await generatePassword(password),
-    });
+    const usernameTaken = await findUserByUsername(username);
 
     if (usernameTaken) {
       return res.json({

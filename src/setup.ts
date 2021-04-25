@@ -7,6 +7,7 @@ import cors from "cors";
 import { AppRouter } from "./routes";
 import errorHandler from "errorhandler";
 import { authentication, authorization } from "./utils/user-manager";
+import passport from "passport";
 
 export function setup(app: Application): void {
   app.use(helmet());
@@ -17,8 +18,10 @@ export function setup(app: Application): void {
   app.use(json());
   authorization();
   authentication();
+  app.use(passport.initialize());
   //Routers
   app.use("/", AppRouter);
+  app.use(passport.initialize());
 
   app.use("/status", express.static("build"));
   app.use("/", express.static("build"));
