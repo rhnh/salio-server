@@ -2,22 +2,28 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { findUser, findUserBy } from "../models/user-models";
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
+import { IUser } from "../types";
 
 export const authentication = (): void => {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
-        const user = await findUser({ username, password });
-        if (user) {
-          return done(null, user);
-        } else {
-          return done(null, false);
-        }
+        const user: IUser | null = await findUser({ username, password });
+        return user !== null ? done(null, user) : done(null, false);
       } catch (error) {
         return done(error, false);
       }
     })
   );
+  //needs to save user._id
+  passport.serializeUser((user, done) => {
+    done(null, user);
+  });
+
+  passport.deserializeUser(async (id: string, done) => {
+    const user = await findUserBy(id);
+    done(null, user);
+  });
 };
 
 export const authorization = (): void => {

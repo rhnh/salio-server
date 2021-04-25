@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { addUser, findUser } from "../models/user-models";
 import { httpStatus } from "../types";
-import { hashedPassword, isVerifiedToken } from "../utils/helpers";
+import { generatePassword } from "../utils/password";
 
 export async function registerUser(
   req: Request,
@@ -13,16 +13,25 @@ export async function registerUser(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    req.body.password = hashedPassword(req.body.password);
     const { username, password } = req.body;
-    const usernameTaken = await findUser({ username, password });
+
+    const usernameTaken = await findUser({
+      username,
+      password: await generatePassword(password),
+    });
+
     if (usernameTaken) {
       return res.json({
         status: httpStatus.conflict,
         message: `User: ${username} already taken!`,
       });
     }
-    const done = await addUser({ username, password });
+
+    const done = await addUser({
+      username,
+      password: await generatePassword(password),
+    });
+
     return done
       ? res.json({
           message: `You have successfully register`,
@@ -37,31 +46,3 @@ export async function registerUser(
     res.json({ statusMessage: "something went wrong", statusCode: 505 });
   }
 }
-
-export const verifyUserToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { authorization } = req.headers || "";
-  try {
-    await isVerifiedToken(authorization);
-    next();
-  } catch (error) {
-    res.json({ message: "Error: Cannot verify the token" });
-  }
-};
-
-export const isGuest = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { authorization } = req.headers || "";
-  try {
-    await isVerifiedToken(authorization);
-    next();
-  } catch (error) {
-    res.json({ message: "Error: Cannot verify the token" });
-  }
-};

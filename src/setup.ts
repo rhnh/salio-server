@@ -6,6 +6,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { AppRouter } from "./routes";
 import errorHandler from "errorhandler";
+import { authentication, authorization } from "./utils/user-manager";
 
 export function setup(app: Application): void {
   app.use(helmet());
@@ -14,6 +15,8 @@ export function setup(app: Application): void {
   app.use(morgan("tiny"));
   app.use(urlencoded({ extended: true }));
   app.use(json());
+  authorization();
+  authentication();
   //Routers
   app.use("/", AppRouter);
 
