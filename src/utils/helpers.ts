@@ -1,25 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
+import { ISalioResponse, RHParams } from "../types";
 
-import { ISalioResponse } from "../types";
-
-/**
- * Basic http status code
- * @public
- */
-export enum httpStatus {
-  ok = 200,
-  badRequest = 400,
-  unauthorized = 401,
-  forbidden = 403,
-  notFound = 404,
-  conflict = 409,
-  error = 500,
-}
-interface RHParams {
-  code: httpStatus;
-  message: string;
-  status: boolean;
-}
 export function responseHandler(param: RHParams): RHParams {
   return param;
 }

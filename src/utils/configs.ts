@@ -23,3 +23,7 @@ export const SITE_NAME: string = process.env.SITE_NAME
 export const DB_PORT: number = process.env.DB_PORT
   ? Number(process.env.DB_PORT)
   : 9090;
+
+export const SECRET_TOKEN: string = process.env.SECRET_TOKEN
+  ? process.env.SECRET_TOKEN
+  : "salioilasilasdfjlasdkjfklasldfklasdf";

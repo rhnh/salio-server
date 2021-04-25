@@ -68,3 +68,22 @@ export type MiddleWare = (
   res: Response,
   next?: NextFunction
 ) => Response | NextFunction | void;
+
+/**
+ * Basic http status code
+ * @public
+ */
+export enum httpStatus {
+  ok = 200,
+  badRequest = 400,
+  unauthorized = 401,
+  forbidden = 403,
+  notFound = 404,
+  conflict = 409,
+  error = 500,
+}
+export interface RHParams {
+  code: httpStatus;
+  message: string;
+  status: boolean;
+}

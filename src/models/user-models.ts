@@ -25,6 +25,14 @@ export async function findUser(user: IUser): Promise<IUser | null> {
     return null;
   }
 }
+export async function findUserBy(id: string): Promise<IUser | null> {
+  try {
+    const isUser = await users.findOne({ _id: id });
+    return isUser || null;
+  } catch (error) {
+    return null;
+  }
+}
 interface IChangeUserPassword extends IUser {
   newPassword: string;
 }
