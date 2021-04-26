@@ -49,7 +49,7 @@ export async function getLists(
   }
 }
 
-export async function getListTaxonomyIds({
+export async function getListItemIds({
   listName,
   username,
 }: IList): Promise<IList[] | null> {

@@ -1,21 +1,21 @@
 import { IList, ITaxonomy } from '../types'
 import { ObjectID } from 'bson'
 
-import { getListTaxonomyIds } from './list-models'
+import { getListItemIds } from './list-models'
 import { Collection } from 'mongodb'
 
 let taxonomies: Collection
 
-export const setTaxonomies = (t: Collection): void => {
+export const setItems = (t: Collection): void => {
   taxonomies = t
 }
 
-export async function getTaxonomies({
+export async function getUserItems({
   username,
   listName,
 }: IList): Promise<ITaxonomy[] | null> {
   try {
-    const ids = await getListTaxonomyIds({ username, listName })
+    const ids = await getListItemIds({ username, listName })
     console.log(ids)
     const idArray = ids?.map((id) => new ObjectID(String(id)))
 

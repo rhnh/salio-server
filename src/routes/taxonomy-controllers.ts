@@ -1,5 +1,5 @@
 import { Response, Request } from 'express'
-import { getTaxonomies } from '../models/taxonomy-models'
+import { getUserItems } from '../models/taxonomy-models'
 import { httpStatus, IUser } from '../types'
 
 export async function getTaxonomiesCTRL(
@@ -10,7 +10,7 @@ export async function getTaxonomiesCTRL(
   const { username } = req.user as IUser
   console.log(username, listName)
   try {
-    const taxonomies = (await getTaxonomies({ username, listName })) || []
+    const taxonomies = (await getUserItems({ username, listName })) || []
     if (taxonomies?.length >= 0) {
       return res.status(httpStatus.ok).json(taxonomies)
     } else {
