@@ -62,7 +62,6 @@ export async function findUserById(id: string): Promise<IUser | null> {
         },
       }
     )
-    console.log(isUser, id)
     return isUser || null
   } catch (error) {
     return null
