@@ -1,18 +1,18 @@
-import { Collection } from "mongodb";
-import { IList } from "../types";
+import { Collection } from 'mongodb'
+import { IList } from '../types'
 
-let lists: Collection;
+let lists: Collection
 
 export function setList(collection: Collection): void {
-  lists = collection;
+  lists = collection
 }
 
 export async function addList({ username, listName }: IList): Promise<boolean> {
   try {
-    const newList = await lists.insertOne({ username, listName });
-    return newList.result.n === 1;
+    const newList = await lists.insertOne({ username, listName })
+    return newList.result.n === 1
   } catch (error) {
-    return false;
+    return false
   }
 }
 
@@ -21,10 +21,49 @@ export async function findList({
   listName,
 }: IList): Promise<IList | null> {
   try {
-    const hasFoundList = await lists.findOne({ username, listName });
-    return hasFoundList;
+    const hasList = await lists.findOne({ username, listName })
+    return hasList
   } catch (error) {
-    return null;
+    return null
+  }
+}
+
+interface IListProjection {
+  username?: number
+  _id?: number
+  listName?: number
+  birdIds?: number
+}
+export async function getLists(
+  list: IList,
+  project?: IListProjection
+): Promise<IList[] | null> {
+  try {
+    let hasList
+    if (project)
+      hasList = await lists.find(lists, { projection: { ...project } })
+    else hasList = await lists.find(list)
+    return hasList.toArray()
+  } catch (error) {
+    return null
+  }
+}
+
+export async function getListTaxonomyIds({
+  listName,
+  username,
+}: IList): Promise<IList[] | null> {
+  try {
+    console.log(listName, username)
+    const { birdIds } = await lists.findOne(
+      { username, listName },
+      {
+        projection: { birdIds: 1, _id: 0 },
+      }
+    )
+    return birdIds
+  } catch (error) {
+    return error
   }
 }
 
@@ -40,10 +79,10 @@ export async function updateList(
           listName: newName,
         },
       }
-    );
-    return hasUpdatedList.result.n === 1;
+    )
+    return hasUpdatedList.result.n === 1
   } catch (error) {
-    return false;
+    return false
   }
 }
 
@@ -52,9 +91,9 @@ export async function deleteList({
   username,
 }: IList): Promise<boolean> {
   try {
-    const hasDeletedList = await lists.deleteOne({ username, listName });
-    return hasDeletedList.result.n === 1;
+    const hasDeletedList = await lists.deleteOne({ username, listName })
+    return hasDeletedList.result.n === 1
   } catch (error) {
-    return false;
+    return false
   }
 }
