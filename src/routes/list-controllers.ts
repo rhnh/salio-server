@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import { addList } from '../models/list-models'
-import { httpStatus } from '../types'
+import { httpStatus, IUser } from '../types'
 export async function addListCtrl(
   req: Request,
   res: Response
 ): Promise<Response | void> {
   try {
-    const { username, listName } = req.body
-    console.log(req.user)
+    const { listName } = req.body
+    const { username } = req.user as IUser
     const hasList = await addList({ username, listName })
     if (hasList) {
       return res.json({
@@ -16,10 +16,9 @@ export async function addListCtrl(
         user: req.user,
       })
     }
-    return res.json({
+    return res.status(httpStatus.error).json({
       message: `Something went wrong`,
       done: false,
-      status: httpStatus.error,
     })
   } catch (error) {
     return res.json({
