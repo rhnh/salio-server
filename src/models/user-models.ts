@@ -36,10 +36,17 @@ export async function findUser(user: IUser): Promise<IUser | null> {
   try {
     const { username, password } = user
 
-    const isUser = await users.findOne({
-      username,
-      password,
-    })
+    const isUser = await users.findOne(
+      {
+        username,
+        password,
+      },
+      {
+        projection: {
+          password: 0,
+        },
+      }
+    )
     return isUser || null
   } catch (error) {
     return null
@@ -47,7 +54,14 @@ export async function findUser(user: IUser): Promise<IUser | null> {
 }
 export async function findUserById(id: string): Promise<IUser | null> {
   try {
-    const isUser = await users.findOne({ _id: new ObjectID(id) })
+    const isUser = await users.findOne(
+      { _id: new ObjectID(id) },
+      {
+        projection: {
+          password: 0,
+        },
+      }
+    )
     console.log(isUser, id)
     return isUser || null
   } catch (error) {
