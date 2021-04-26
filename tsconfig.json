@@ -6,7 +6,6 @@
     "declaration": true,
     "noImplicitReturns": true,
     "noUnusedParameters": true,
-    "composite": true,
     "noUnusedLocals": true,
     "esModuleInterop": true
   },
