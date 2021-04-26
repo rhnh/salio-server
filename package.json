@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build:watch": "tsc -b --watch",
-    "start": "nodemon dist/index.js",
+    "start": "node dist/generateToken && nodemon dist/index.js",
     "build": "tsc -b",
     "fresh": "rimraf dist *.tsbuildinfo && yarn build"
   },

@@ -3,8 +3,9 @@ import { asyncFn } from "../utils/helpers";
 import { registerUser } from "./user-controllers";
 import { body } from "express-validator";
 import passport from "passport";
-import { httpStatus } from "../types";
+import { httpStatus, IUser } from "../types";
 import { createAccountLimiter } from "../utils/basic-manager";
+import { generateToken } from "../utils/user-manager";
 
 export const userRouter = Router();
 
@@ -19,9 +20,13 @@ userRouter.post(
 
 userRouter.post("/login", passport.authenticate("local"), (req, res) => {
   if (req.user) {
-    return res.sendStatus(200).send("nice");
+    const token = generateToken(req.user as IUser);
+    res.status(httpStatus.ok);
+    return res.json(token);
+  } else {
+    res.status(httpStatus.badRequest);
+    return res.json({
+      failed: true,
+    });
   }
-  return res.sendStatus(httpStatus.badRequest).json({
-    failed: true,
-  });
 });

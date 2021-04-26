@@ -18,8 +18,7 @@ export async function registerUser(
     const usernameTaken = await findUserByUsername(username);
 
     if (usernameTaken) {
-      return res.json({
-        status: httpStatus.conflict,
+      return res.status(httpStatus.conflict).json({
         message: `User: ${username} already taken!`,
       });
     }

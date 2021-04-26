@@ -13,7 +13,7 @@ export function setup(app: Application): void {
   app.use(helmet());
   app.use(cors());
 
-  app.use(morgan("tiny"));
+  app.use(morgan("combined"));
   app.use(urlencoded({ extended: true }));
   app.use(json());
   authorization();
