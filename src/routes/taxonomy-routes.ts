@@ -6,7 +6,7 @@ import { addItemCTRL, getUserItemsCTRL } from './taxonomy-controllers'
 
 export const taxonomyRouter = Router()
 
-taxonomyRouter.post('/', verifyUser, asyncFn(getUserItemsCTRL))
+taxonomyRouter.post('/show/:listName', verifyUser, asyncFn(getUserItemsCTRL))
 
 taxonomyRouter.post(
   '/new/item',

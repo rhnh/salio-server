@@ -12,18 +12,17 @@ export async function getUserItemsCTRL(
   req: Request,
   res: Response
 ): Promise<Response> {
-  let { list } = req.params
-  list = list || ''
-  console.log(list, req.params, 'hooooooooooooooooh')
+  let { listName } = req.params
+  listName = listName || ''
   const { username } = req.user as IUser
   try {
-    const taxonomies = (await getUserItems({ username, listName: list })) || []
+    const taxonomies = (await getUserItems({ username, listName })) || []
     if (taxonomies?.length >= 0) {
       return res.status(httpStatus.ok).json(taxonomies)
     } else {
       return res.status(httpStatus.badRequest).json({
         done: false,
-        message: `no list "${list}" found for User "${username}" `,
+        message: `no list "${listName}" found for User "${username}" `,
       })
     }
   } catch (error) {
