@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { addList, deleteList } from '../models/list-models'
+import { addList, deleteList, findList } from '../models/list-models'
 import { httpStatus, IUser } from '../types'
 
 export async function addListCtrl(
@@ -9,6 +9,12 @@ export async function addListCtrl(
   try {
     const { listName } = req.body
     const { username } = req.user as IUser
+    const alreadyList = await findList({ listName, username })
+    if (alreadyList) {
+      return res
+        .status(httpStatus.badRequest)
+        .json({ message: 'already exist', done: false })
+    }
     const hasList = await addList({ username, listName })
     if (hasList) {
       return res.json({
