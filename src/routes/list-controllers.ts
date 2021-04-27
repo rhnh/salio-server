@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { validationResult } from 'express-validator'
 import { addList, deleteList, findList } from '../models/list-models'
 import { httpStatus, IUser } from '../types'
 
@@ -10,6 +11,10 @@ export async function addListCtrl(
     const { listName } = req.body
     const { username } = req.user as IUser
     const alreadyList = await findList({ listName, username })
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
     if (alreadyList) {
       return res
         .status(httpStatus.badRequest)
@@ -41,8 +46,11 @@ export async function deleteListCtrl(
 ): Promise<Response | void> {
   try {
     const { listName } = req.params
-
     const { username } = req.user as IUser
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
     if (listName === '' || !listName) {
       return res
         .status(httpStatus.badRequest)

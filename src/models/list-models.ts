@@ -54,7 +54,6 @@ export async function getListItemIds({
   username,
 }: IList): Promise<IList[] | null> {
   try {
-    console.log(listName, username)
     const { birdIds } = await lists.findOne(
       { username, listName },
       {

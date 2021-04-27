@@ -3,15 +3,15 @@
  * @internal
  */
 
-import { NextFunction } from "express";
+import { NextFunction } from 'express'
 
 interface IBaseModel {
-  _id?: string;
-  createAt?: Date;
+  _id?: string
+  createAt?: Date
 }
 
-export type ICategories = "species" | "genus" | "family" | "order";
-export type IGender = "female" | "male" | "unknown";
+export type ICategories = 'species' | 'genus' | 'family' | 'order'
+export type IGender = 'female' | 'male' | 'unknown'
 /**
  * - A Taxonomy can be specified for either a species, genus, family , order or even a bird itself.
  * - By default every category's approved is false
@@ -20,16 +20,16 @@ export type IGender = "female" | "male" | "unknown";
  * @public
  */
 export interface ITaxonomy extends IBaseModel {
-  taxonomyName: string;
-  category: ICategories;
-  parent?: string;
-  approved: boolean;
-  username: string;
-  slug?: string;
-  info?: string;
-  sex?: IGender | undefined;
-  ancestors?: string[];
-  taxonomy?: string;
+  taxonomyName: string
+  category: ICategories
+  parent?: string
+  approved: boolean
+  username: string
+  slug?: string
+  info?: string
+  sex?: IGender | undefined
+  ancestors?: string[]
+  taxonomy?: string
 }
 
 /**
@@ -37,12 +37,12 @@ export interface ITaxonomy extends IBaseModel {
  * @public
  */
 export interface IList extends IBaseModel {
-  username: string;
-  listName: string;
-  birdIds?: string[];
+  username: string
+  listName: string
+  birdIds?: string[]
 }
 
-export type Role = "user" | "mod" | "admin";
+export type Role = 'user' | 'mod' | 'admin'
 /**
  * - Every User needs a username
  * - Every User needs a password
@@ -50,24 +50,24 @@ export type Role = "user" | "mod" | "admin";
  * @public
  */
 export interface IUser extends IBaseModel {
-  username: string;
-  password: string;
-  role?: Role | undefined;
+  username: string
+  password: string
+  role?: Role | undefined
 }
 
 export interface ISalioResponse<T> {
-  message?: string;
-  methodName?: string;
-  done?: boolean;
-  data?: T | null | T[];
-  error?: Error;
+  message?: string
+  methodName?: string
+  done?: boolean
+  data?: T | null | T[]
+  error?: Error
 }
 
 export type MiddleWare = (
   req: Request,
   res: Response,
   next?: NextFunction
-) => Response | NextFunction | void;
+) => Response | NextFunction | void
 
 /**
  * Basic http status code
@@ -83,7 +83,7 @@ export enum httpStatus {
   error = 500,
 }
 export interface RHParams {
-  code: httpStatus;
-  message: string;
-  status: boolean;
+  code: httpStatus
+  message: string
+  status: boolean
 }

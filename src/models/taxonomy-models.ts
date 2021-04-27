@@ -16,17 +16,30 @@ export async function getUserItems({
 }: IList): Promise<ITaxonomy[] | null> {
   try {
     const ids = await getListItemIds({ username, listName })
-    console.log(ids)
     const idArray = ids?.map((id) => new ObjectID(String(id)))
 
     idArray?.map((d) => console.error(typeof d))
     if (ids) {
       const t = await taxonomies.find({ _id: { $in: idArray } }).toArray()
-      console.log(ids, t)
       return t
     }
     return null
   } catch (error) {
     return null
+  }
+}
+
+export async function addItems(items: ITaxonomy): Promise<boolean> {
+  const { category } = items
+  try {
+    const hasItem = await taxonomies.insertOne({
+      ...items,
+      category: category || 'species',
+      approved: false,
+    })
+    return hasItem.result.n === 1
+  } catch (error) {
+    console.log(error)
+    return error
   }
 }
