@@ -10,7 +10,7 @@ taxonomyRouter.post('/show/:listName', verifyUser, asyncFn(getUserItemsCTRL))
 
 taxonomyRouter.post(
   '/new/item',
-  body(['taxonomyName', 'category', 'sex'])
+  body(['taxonomyName', 'category'])
     .not()
     .isEmpty()
     .trim()

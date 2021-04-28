@@ -40,7 +40,14 @@ export async function addItemCTRL(
   res: Response
 ): Promise<Response> {
   try {
-    const { taxonomyName, category, sex } = req.body as ITaxonomy
+    const {
+      taxonomyName,
+      category,
+      parent,
+      ancestors,
+      taxonomy,
+      sex,
+    } = req.body as ITaxonomy
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -51,6 +58,9 @@ export async function addItemCTRL(
       category,
       sex,
       username,
+      parent,
+      ancestors,
+      taxonomy,
       approved: false,
     }
     const hasItem = await addItems(item)
