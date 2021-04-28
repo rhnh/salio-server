@@ -10,11 +10,7 @@ taxonomyRouter.post('/show/:listName', verifyUser, asyncFn(getUserItemsCTRL))
 
 taxonomyRouter.post(
   '/new/item',
-  body(['taxonomyName', 'category'])
-    .not()
-    .isEmpty()
-    .trim()
-    .isLength({ min: 3 }),
+  body(['taxonomy', 'category']).not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
   asyncFn(addItemCTRL)
 )

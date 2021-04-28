@@ -67,7 +67,7 @@ export async function addItemCTRL(
     if (hasItem) {
       return res
         .status(httpStatus.ok)
-        .json({ done: true, message: `${taxonomyName} has been added!` })
+        .json({ done: true, message: `${taxonomy} has been added!` })
     }
     return res.status(httpStatus.badRequest).json({ done: false })
   } catch (error) {

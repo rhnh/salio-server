@@ -1,12 +1,17 @@
-import { Router } from "express";
-import { listRouter } from "./list-routes";
-import { MainRouter } from "./main-routes";
-import { taxonomyRouter } from "./taxonomy-routes";
-import { userRouter } from "./user-routes";
+import { Router } from 'express'
+import { appCors } from '../utils/cors'
 
-export const AppRouter = Router();
+import { listRouter } from './list-routes'
+import { MainRouter } from './main-routes'
+import { taxonomyRouter } from './taxonomy-routes'
+import { userRouter } from './user-routes'
 
-AppRouter.use("/", MainRouter);
-AppRouter.use("/lists", listRouter);
-AppRouter.use("/items", taxonomyRouter);
-AppRouter.use("/users", userRouter);
+export const AppRouter = Router()
+AppRouter.options('*', appCors, (_, res) => {
+  res.status(200)
+})
+
+AppRouter.use('/', MainRouter)
+AppRouter.use('/lists', listRouter)
+AppRouter.use('/items', taxonomyRouter)
+AppRouter.use('/users', userRouter)
