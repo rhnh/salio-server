@@ -6,12 +6,9 @@ import passport from 'passport'
 import { httpStatus, IUser } from '../types'
 import { createAccountLimiter } from '../utils/basic-manager'
 import { generateToken } from '../utils/user-manager'
-import { appCors } from '../utils/cors'
 
 export const userRouter = Router()
-userRouter.options('*', appCors, (_, res) => {
-  res.sendStatus(200)
-})
+
 userRouter.post(
   '/signup',
   createAccountLimiter,

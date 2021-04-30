@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { addListCtrl, deleteListCtrl } from './list-controllers'
+import { addListCtrl, deleteListCtrl, showListCtrl } from './list-controllers'
 import { body, param } from 'express-validator'
 import { verifyUser } from '../utils/user-manager'
 import { asyncFn } from '../utils/helpers'
@@ -21,3 +21,5 @@ listRouter.delete(
   verifyUser,
   asyncFn(deleteListCtrl)
 )
+
+listRouter.post('/show', verifyUser, asyncFn(showListCtrl))

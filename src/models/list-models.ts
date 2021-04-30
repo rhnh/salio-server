@@ -96,3 +96,27 @@ export async function deleteList({
     return false
   }
 }
+
+export async function getListsByUsername({
+  username,
+}: {
+  username: string
+}): Promise<IList[] | null> {
+  try {
+    const allLists = await lists
+      .find(
+        { username },
+        {
+          projection: {
+            username: 1,
+            _id: 1,
+            listName: 1,
+          },
+        }
+      )
+      .toArray()
+    return allLists
+  } catch (error) {
+    return error
+  }
+}

@@ -1,6 +1,11 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
-import { addList, deleteList, findList } from '../models/list-models'
+import {
+  addList,
+  deleteList,
+  findList,
+  getListsByUsername,
+} from '../models/list-models'
 import { httpStatus, IUser } from '../types'
 
 export async function addListCtrl(
@@ -73,5 +78,23 @@ export async function deleteListCtrl(
       status: httpStatus.badRequest,
       done: false,
     })
+  }
+}
+
+export async function showListCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+  try {
+    const allLists = await getListsByUsername({ username })
+    if (allLists) {
+      return res.status(200).json(allLists)
+    }
+    return res
+      .status(httpStatus.badRequest)
+      .json({ message: 'no list found', done: false })
+  } catch (error) {
+    return error
   }
 }

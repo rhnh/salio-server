@@ -1,12 +1,12 @@
-import passport from 'passport'
-import { Strategy as LocalStrategy } from 'passport-local'
-import { findUserById, findUserByUsername } from '../models/user-models'
-import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
-import path from 'path'
 import fs from 'fs'
+import path from 'path'
+import passport from 'passport'
 import jsonwebtoken from 'jsonwebtoken'
 import { IUser } from '../types'
 import { isVerifiedPass } from './password'
+import { Strategy as LocalStrategy } from 'passport-local'
+import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
+import { findUserById, findUserByUsername } from '../models/user-models'
 const PUBLIC_KEY_PATH = path.join(__dirname, '..', 'id_rsa_pub.pem')
 const PRIVATE_KEY_PATH = path.join(__dirname, '..', 'id_rsa_priv.pem')
 const PUBLIC_KEY = fs.readFileSync(PUBLIC_KEY_PATH, 'utf-8')
@@ -90,7 +90,7 @@ export function generateToken(user: IUser): { token: string; expires: string } {
   })
 
   return {
-    token: 'Bearer ' + signedToken,
+    token: signedToken,
     expires: expiresIn,
   }
 }
