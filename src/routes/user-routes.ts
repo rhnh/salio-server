@@ -5,7 +5,7 @@ import { body } from 'express-validator'
 import passport from 'passport'
 import { httpStatus, IUser } from '../types'
 import { createAccountLimiter } from '../utils/basic-manager'
-import { generateToken } from '../utils/user-manager'
+import { generateToken, verifyUser } from '../utils/user-manager'
 
 export const userRouter = Router()
 
@@ -31,7 +31,7 @@ userRouter.post('/login', passport.authenticate('local'), (req, res) => {
   }
 })
 
-userRouter.post('/logout', (req, res) => {
+userRouter.post('/logout', verifyUser, (req, res) => {
   req.logOut()
   res.redirect('/')
 })
