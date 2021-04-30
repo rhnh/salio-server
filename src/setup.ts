@@ -8,11 +8,15 @@ import { AppRouter } from './routes'
 import errorHandler from 'errorhandler'
 import { authentication, authorization } from './utils/user-manager'
 import passport from 'passport'
-
+import cors from 'cors'
 export function setup(app: Application): void {
   app.use(helmet())
-  // app.use(cors());
+  const allowedOrigins = {
+    origin: 'http://localhost:3000',
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  }
 
+  app.use(cors(allowedOrigins))
   app.use(morgan('combined'))
   app.use(urlencoded({ extended: true }))
   app.use(json())

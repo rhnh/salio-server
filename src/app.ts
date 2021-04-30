@@ -6,13 +6,12 @@ import { setup } from './setup'
 
 export const app: Application = express()
 app.use(express.static(path.join(__dirname, 'build')))
-const allowedOrigins = ['http://localhost:3000']
-
-const options: cors.CorsOptions = {
-  origin: allowedOrigins,
+const allowedOrigins = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
-app.use(cors(options))
+app.use(cors(allowedOrigins))
 app.get('/', (_, res: Response) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'))
 })
