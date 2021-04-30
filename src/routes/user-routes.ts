@@ -30,3 +30,8 @@ userRouter.post('/login', passport.authenticate('local'), (req, res) => {
     })
   }
 })
+
+userRouter.post('/logout', (req, res) => {
+  req.logOut()
+  res.redirect('/')
+})
