@@ -17,7 +17,7 @@ export function setup(app: Application): void {
   }
 
   app.use(cors(allowedOrigins))
-  app.use(morgan('combined'))
+  app.use(morgan('dev'))
   app.use(urlencoded({ extended: true }))
   app.use(json())
   authorization()
