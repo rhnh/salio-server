@@ -13,6 +13,7 @@ export async function getUserItemsCTRL(
   res: Response
 ): Promise<Response> {
   let { listName } = req.params
+
   listName = listName || ''
   const { username } = req.user as IUser
   try {
