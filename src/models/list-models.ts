@@ -1,5 +1,5 @@
 import { Collection } from 'mongodb'
-import { IList } from '../types'
+import { IList, ITaxonomy } from '../types'
 
 let lists: Collection
 
@@ -118,5 +118,25 @@ export async function getListsByUsername({
     return allLists
   } catch (error) {
     return error
+  }
+}
+interface IAddItem {
+  itemId: string
+  listName: string
+  username: string
+}
+export async function addListItem(param: IAddItem): Promise<boolean> {
+  const { username, listName, itemId } = param
+  try {
+    const isAdd = await lists.updateOne(
+      { username, listName },
+      { $push: { birdIds: itemId } }
+    )
+    if (isAdd.upsertedId) {
+      return true
+    }
+    return false
+  } catch (error) {
+    return false
   }
 }

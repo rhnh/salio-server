@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import {
   addList,
+  addListItem,
   deleteList,
   findList,
   getListsByUsername,
@@ -15,6 +16,7 @@ export async function addListCtrl(
   try {
     const { listName } = req.body
     const { username } = req.user as IUser
+    console.log(listName, username)
     const alreadyList = await findList({ listName, username })
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -52,9 +54,10 @@ export async function deleteListCtrl(
   try {
     const { listName } = req.params
     const { username } = req.user as IUser
+    console.log(listName)
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() })
+      return res.status(httpStatus.badRequest).json({ errors: errors.array() })
     }
     if (listName === '' || !listName) {
       return res
@@ -96,5 +99,33 @@ export async function showListCtrl(
       .json({ message: 'no list found', done: false })
   } catch (error) {
     return error
+  }
+}
+
+export async function addListItemCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+  const { listName, itemId } = req.body
+  try {
+    const done = addListItem({ username, listName, itemId })
+    if (done) {
+      return res.json({
+        done: true,
+        message: 'successfully added',
+      })
+    } else {
+      return res.json({
+        done: false,
+        message: 'Something went wrong',
+      })
+    }
+  } catch (error) {
+    return res.json({
+      done: false,
+      error: true,
+      message: error.message,
+    })
   }
 }
