@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { asyncFn } from '../utils/helpers'
-import { registerUser } from './user-controllers'
+import { registerUser } from './Users'
 import { body } from 'express-validator'
 import passport from 'passport'
 import { httpStatus, IUser } from '../types'
@@ -10,7 +10,7 @@ import { generateToken } from '../utils/user-manager'
 export const userRouter = Router()
 
 userRouter.post(
-  '/signup',
+  '/',
   createAccountLimiter,
   body('username').not().isEmpty().trim().isLength({ min: 3 }),
   body('password').not().isEmpty().trim().isLength({ min: 3 }),
@@ -18,7 +18,7 @@ userRouter.post(
   asyncFn(registerUser)
 )
 
-userRouter.post('/login', passport.authenticate('local'), (req, res) => {
+userRouter.post('/user', passport.authenticate('local'), (req, res) => {
   if (req.user) {
     const token = generateToken(req.user as IUser)
     res.status(httpStatus.ok)
@@ -32,7 +32,7 @@ userRouter.post('/login', passport.authenticate('local'), (req, res) => {
   }
 })
 
-userRouter.post('/logout', (req, res) => {
+userRouter.get('/user', (req, res) => {
   req.logOut()
   return res.json({
     done: true,

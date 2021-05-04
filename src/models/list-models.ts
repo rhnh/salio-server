@@ -1,5 +1,5 @@
 import { Collection } from 'mongodb'
-import { IList, ITaxonomy } from '../types'
+import { IList } from '../types'
 
 let lists: Collection
 
@@ -7,7 +7,7 @@ export function setList(collection: Collection): void {
   lists = collection
 }
 
-export async function addList({ username, listName }: IList): Promise<boolean> {
+export async function create({ username, listName }: IList): Promise<boolean> {
   try {
     const newList = await lists.insertOne({ username, listName })
     return newList.result.n === 1
@@ -16,7 +16,7 @@ export async function addList({ username, listName }: IList): Promise<boolean> {
   }
 }
 
-export async function findList({
+export async function getListUserListName({
   username,
   listName,
 }: IList): Promise<IList | null> {
@@ -85,7 +85,7 @@ export async function updateList(
   }
 }
 
-export async function deleteList({
+export async function deleteUserListName({
   listName,
   username,
 }: IList): Promise<boolean> {
@@ -121,16 +121,16 @@ export async function getListsByUsername({
   }
 }
 interface IAddItem {
-  itemId: string
+  taxonomyId: string
   listName: string
   username: string
 }
-export async function addListItem(param: IAddItem): Promise<boolean> {
-  const { username, listName, itemId } = param
+export async function createListItem(param: IAddItem): Promise<boolean> {
+  const { username, listName, taxonomyId } = param
   try {
     const isAdd = await lists.updateOne(
       { username, listName },
-      { $push: { birdIds: itemId } }
+      { $push: { birdIds: taxonomyId } }
     )
     if (isAdd.upsertedId) {
       return true

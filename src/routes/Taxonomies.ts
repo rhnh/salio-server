@@ -1,6 +1,6 @@
 import { Response, Request } from 'express'
 import { validationResult } from 'express-validator'
-import { addItems, getUserItems } from '../models/taxonomy-models'
+import { addTaxonomy, getUserTaxonomy } from '../models/taxonomy-models'
 import { httpStatus, ITaxonomy, IUser } from '../types'
 /**
  *
@@ -17,7 +17,7 @@ export async function getUserItemsCTRL(
   listName = listName || ''
   const { username } = req.user as IUser
   try {
-    const taxonomies = (await getUserItems({ username, listName })) || []
+    const taxonomies = (await getUserTaxonomy({ username, listName })) || []
     if (taxonomies?.length >= 0) {
       return res.status(httpStatus.ok).json(taxonomies)
     } else {
@@ -64,11 +64,15 @@ export async function addItemCTRL(
       taxonomy,
       approved: false,
     }
-    const hasItem = await addItems(item)
-    if (hasItem) {
+    const hasItem = await addTaxonomy(item)
+    if (hasItem.done) {
       return res
         .status(httpStatus.ok)
-        .json({ done: true, message: `${taxonomy} has been added!` })
+        .json({
+          done: true,
+          message: `${taxonomy} has been added!`,
+          birdId: hasItem.data,
+        })
     }
     return res.status(httpStatus.badRequest).json({ done: false })
   } catch (error) {

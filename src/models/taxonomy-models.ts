@@ -1,4 +1,4 @@
-import { IList, ITaxonomy } from '../types'
+import { IList, ISalioResponse, ITaxonomy } from '../types'
 import { ObjectID } from 'bson'
 
 import { getListItemIds } from './list-models'
@@ -10,7 +10,7 @@ export const setItems = (t: Collection): void => {
   taxonomies = t
 }
 
-export async function getUserItems({
+export async function getUserTaxonomy({
   username,
   listName,
 }: IList): Promise<ITaxonomy[] | null> {
@@ -29,17 +29,32 @@ export async function getUserItems({
   }
 }
 
-export async function addItems(items: ITaxonomy): Promise<boolean> {
-  const { category } = items
+export async function addTaxonomy(
+  taxonomy: ITaxonomy
+): Promise<ISalioResponse<string>> {
+  const item: ITaxonomy = taxonomy as ITaxonomy
+  const { category } = item
   try {
     const hasItem = await taxonomies.insertOne({
-      ...items,
+      ...taxonomy,
       category: category || 'species',
       approved: false,
     })
-    return hasItem.result.n === 1
+    if (hasItem.result.n === 1) {
+      return {
+        done: true,
+        data: hasItem.insertedId,
+      }
+    }
+    return {
+      done: false,
+      message: 'Something went wrong',
+    }
   } catch (error) {
     console.log(error)
-    return error
+    return {
+      done: false,
+      error: new Error(error),
+    }
   }
 }
