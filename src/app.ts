@@ -12,7 +12,7 @@ const allowedOrigins = {
 }
 
 app.use(cors(allowedOrigins))
-app.get('/api', (_, res: Response) => {
+app.get('/', (_, res: Response) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'))
 })
 

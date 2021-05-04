@@ -24,7 +24,7 @@ export function setup(app: Application): void {
   authentication()
   app.use(passport.initialize())
   //Routers
-  app.use('/', AppRouter)
+  app.use('/api', AppRouter)
   app.use(passport.initialize())
 
   app.use('/status', express.static('build'))
