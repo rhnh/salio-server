@@ -3,7 +3,7 @@ import { validationResult } from 'express-validator'
 import * as ListModel from '../models/list-models'
 import { httpStatus, IUser } from '../types'
 
-export async function addList(
+export async function createList(
   req: Request,
   res: Response
 ): Promise<Response | void> {

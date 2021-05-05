@@ -16,30 +16,33 @@ SECRET_TOKEN=your token
 ## Login Route:
 
 To register:
-> POST: http://localhost:8080/users
+> POST: http://localhost:8080/api/users
 
 To Login:
-> POST: http://localhost:8080/users/user
+> POST: http://localhost:8080/api/users/user
 
 To Logout:
-> GET: http://localhost:8080/users/user 
+> GET: http://localhost:8080/api/users/user 
 
 ## List Route:
 
 To Create new list:
-> POST: http://localhost:8080/lists
+> POST: http://localhost:8080/api/lists
 
 To Get certain List:
 
-> GET: http://localhost:8080/lists/list/:listName
+> GET: http://localhost:8080/api/lists/list/:listName
 
+To DELETE: http://localhost:8080/api/lists/:listName
+
+## BirdList
 To get All Birds for the Certain list:
 
-> POST: http://localhost:8080/lists/:listName/birds
+> POST: http://localhost:8080/api/lists/:listName/birds
 
 To get Certain bird for the certain list:
 
-> POST: http://localhost:8080/lists/list/:listName/birds/bird/:birdName
+> POST: http://localhost:8080/api/lists/list/:listName/birds/bird/:birdName
 
 To add Certain bird into certain list:
-> POST: http://localhost:8080/lists/:listName/birds
+> POST: http://localhost:8080/api/lists/:listName/birds

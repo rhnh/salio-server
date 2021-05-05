@@ -1,52 +1,41 @@
 import { Router } from 'express'
-import { addList, addListItem, deleteList, getList } from './Lists'
+import { createList, addListItem, deleteList, getList } from './Lists'
 import { param, body } from 'express-validator'
 import { verifyUser } from '../utils/user-manager'
 import { asyncFn } from '../utils/helpers'
 
 export const listRouter = Router()
 
+//Create new list
 listRouter.post(
   '/',
   body('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(addList)
+  asyncFn(createList)
 )
-
+//Delete list by Name
 listRouter.delete(
-  '/',
-  body('listName').not().isEmpty().trim().isLength({ min: 3 }),
+  '/:listName',
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
   asyncFn(deleteList)
 )
-
+//get all list
 listRouter.get('/', verifyUser, asyncFn(getList))
 
+//create a new bird or the specific listName
 listRouter.post(
-  '/birds',
+  '/lists/birds',
   body('listName').not().isEmpty().trim().isLength({ min: 3 }),
   body('taxonomyName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
   asyncFn(addListItem)
 )
-
+/**
+ * TODO: a function need to be written for this.
+ */
 listRouter.delete(
-  '/birds',
-  body('listName').not().isEmpty().trim().isLength({ min: 3 }),
-  body('taxonomyName').not().isEmpty().trim().isLength({ min: 3 }),
-  verifyUser
-  // asyncFn(addListItem)
-)
-
-listRouter.put(
-  '/birds',
-  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
-  param('taxonomyName').not().isEmpty().trim().isLength({ min: 3 }),
-  verifyUser
-  // asyncFn(addListItem)
-)
-listRouter.get(
-  '/birds',
+  '/lists/:listName/birds/:taxonomyName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   param('taxonomyName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser

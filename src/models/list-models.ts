@@ -9,7 +9,11 @@ export function setList(collection: Collection): void {
 
 export async function create({ username, listName }: IList): Promise<boolean> {
   try {
-    const newList = await lists.insertOne({ username, listName })
+    const newList = await lists.insertOne({
+      username,
+      listName,
+      createAt: new Date(Date.now()),
+    })
     return newList.result.n === 1
   } catch (error) {
     return false
