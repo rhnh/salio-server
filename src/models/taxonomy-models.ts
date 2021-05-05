@@ -29,7 +29,7 @@ export async function getUserTaxonomy({
   }
 }
 
-export async function addTaxonomy(
+export async function createTaxonomy(
   taxonomy: ITaxonomy
 ): Promise<ISalioResponse<string>> {
   const item: ITaxonomy = taxonomy as ITaxonomy
@@ -49,6 +49,40 @@ export async function addTaxonomy(
     return {
       done: false,
       message: 'Something went wrong',
+    }
+  } catch (error) {
+    console.log(error)
+    return {
+      done: false,
+      error: new Error(error),
+    }
+  }
+}
+
+export async function updateTaxonomy(
+  taxonomy: ITaxonomy,
+  uTaxonomy: ITaxonomy
+): Promise<ISalioResponse<string>> {
+  try {
+    const hasItem = await taxonomies.updateOne(
+      {
+        taxonomy,
+      },
+      {
+        set: {
+          uTaxonomy,
+        },
+      }
+    )
+    if (hasItem.result.n === 1) {
+      return {
+        done: true,
+        data: [hasItem.upsertedId.toString()],
+      }
+    }
+    return {
+      done: false,
+      message: 'Something went wrong in database',
     }
   } catch (error) {
     console.log(error)

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createList, addListItem, deleteList, getList } from './Lists'
+import { createList, deleteList, getList, getListByName } from './Lists'
 import { param, body } from 'express-validator'
 import { verifyUser } from '../utils/user-manager'
 import { asyncFn } from '../utils/helpers'
@@ -23,21 +23,10 @@ listRouter.delete(
 //get all list
 listRouter.get('/', verifyUser, asyncFn(getList))
 
-//create a new bird or the specific listName
-listRouter.post(
-  '/lists/birds',
-  body('listName').not().isEmpty().trim().isLength({ min: 3 }),
-  body('taxonomyName').not().isEmpty().trim().isLength({ min: 3 }),
-  verifyUser,
-  asyncFn(addListItem)
-)
-/**
- * TODO: a function need to be written for this.
- */
-listRouter.delete(
-  '/lists/:listName/birds/:taxonomyName',
+//get specific list
+listRouter.get(
+  '/list/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
-  param('taxonomyName').not().isEmpty().trim().isLength({ min: 3 }),
-  verifyUser
-  // asyncFn(addListItem)
+  verifyUser,
+  asyncFn(getListByName)
 )

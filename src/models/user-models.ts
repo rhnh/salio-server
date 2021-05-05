@@ -13,6 +13,7 @@ export async function addUser(user: IUser): Promise<boolean> {
     const newUser = await users.insertOne({
       username,
       password,
+      role: 'user',
     })
     return newUser.result.n === 1
   } catch (error) {

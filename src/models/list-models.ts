@@ -9,11 +9,7 @@ export function setList(collection: Collection): void {
 
 export async function create({ username, listName }: IList): Promise<boolean> {
   try {
-    const newList = await lists.insertOne({
-      username,
-      listName,
-      createAt: new Date(Date.now()),
-    })
+    const newList = await lists.insertOne({ username, listName })
     return newList.result.n === 1
   } catch (error) {
     return false
@@ -31,7 +27,17 @@ export async function getListUserListName({
     return null
   }
 }
-
+export async function getListByUserListName({
+  listName,
+  username,
+}: IList): Promise<IList | null> {
+  try {
+    const result = await lists.findOne({ username, listName })
+    return result
+  } catch (error) {
+    return error
+  }
+}
 interface IListProjection {
   username?: number
   _id?: number

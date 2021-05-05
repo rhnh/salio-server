@@ -10,7 +10,6 @@ export async function createList(
   try {
     const { listName } = req.body
     const { username } = req.user as IUser
-    console.log(listName, username)
     const alreadyList = await ListModel.getListUserListName({
       listName,
       username,
@@ -51,7 +50,7 @@ export async function deleteList(
   try {
     const { listName } = req.params
     const { username } = req.user as IUser
-    console.log(listName)
+
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(httpStatus.badRequest).json({ errors: errors.array() })
@@ -87,6 +86,27 @@ export async function getList(req: Request, res: Response): Promise<Response> {
     const allLists = await ListModel.getListsByUsername({ username })
     if (allLists) {
       return res.status(200).json(allLists)
+    }
+    return res
+      .status(httpStatus.badRequest)
+      .json({ message: 'no list found', done: false })
+  } catch (error) {
+    return error
+  }
+}
+export async function getListByName(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+  const { listName } = req.params
+  try {
+    const list = await ListModel.getListByUserListName({
+      username,
+      listName,
+    })
+    if (list) {
+      return res.status(200).json(list)
     }
     return res
       .status(httpStatus.badRequest)
