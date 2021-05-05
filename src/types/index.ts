@@ -20,7 +20,8 @@ export type IGender = 'female' | 'male' | 'unknown'
  * @public
  */
 export interface ITaxonomy extends IBaseModel {
-  taxonomyName: string
+  taxonomyName?: string // only species can have it.
+  taxonomy: string // It is a must for species: It should container binomial name
   category: ICategories
   parent?: string
   approved: boolean
@@ -29,7 +30,6 @@ export interface ITaxonomy extends IBaseModel {
   info?: string
   sex?: IGender | undefined
   ancestors?: string[]
-  taxonomy?: string
 }
 
 /**
