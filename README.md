@@ -27,13 +27,17 @@ To Logout:
 ## List Route:
 
 To Create new list:
-> POST: http://localhost:8080/api/lists
+> POST: http://localhost:8080/api/lists 
 
 To Get certain List:
 
 > GET: http://localhost:8080/api/lists/list/:listName
 
-To DELETE: http://localhost:8080/api/lists/:listName
+To DELETE: 
+> http://localhost:8080/api/lists/:listName
+
+To GET All list for a user
+> http://localhost:8080/api/lists
 
 ## BirdList
 To get All Birds for the Certain list:
