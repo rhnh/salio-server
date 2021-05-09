@@ -75,6 +75,40 @@ export async function getListItemIds({
     return error
   }
 }
+export async function getListItems({
+  listName,
+  username,
+}: IList): Promise<IList[] | null> {
+  try {
+    const listItems = await lists.aggregate([
+      {
+        $match: {
+          username,
+          listName,
+        },
+      },
+      {
+        $lookup: {
+          from: 'taxonomies',
+          localField: 'birdIds',
+          foreignField: '_id',
+          as: 'birds',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          username: 1,
+          listName: 1,
+          birds: 1,
+        },
+      },
+    ])
+    return listItems.toArray()
+  } catch (error) {
+    return error
+  }
+}
 
 export async function updateList(
   { listName, username }: IList,
