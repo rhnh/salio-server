@@ -33,6 +33,7 @@ userRouter.post('/user', passport.authenticate('local'), (req, res) => {
 })
 
 userRouter.get('/user', (req, res) => {
+  console.log('here you are')
   req.logOut()
   return res.json({
     done: true,

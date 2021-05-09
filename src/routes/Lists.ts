@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import * as ListModel from '../models/list-models'
+import { getSpeciesByIds } from '../models/taxonomy-models'
 import { httpStatus, IUser } from '../types'
 
 export async function createList(
@@ -10,7 +11,7 @@ export async function createList(
   try {
     const { listName } = req.body
     const { username } = req.user as IUser
-    const alreadyList = await ListModel.getListUserListName({
+    const alreadyList = await ListModel.getList({
       listName,
       username,
     })
@@ -82,6 +83,7 @@ export async function deleteList(
 
 export async function getList(req: Request, res: Response): Promise<Response> {
   const { username } = req.user as IUser
+
   try {
     const allLists = await ListModel.getListsByUsername({ username })
     if (allLists) {
@@ -94,6 +96,7 @@ export async function getList(req: Request, res: Response): Promise<Response> {
     return error
   }
 }
+
 export async function getListByName(
   req: Request,
   res: Response
@@ -101,7 +104,7 @@ export async function getListByName(
   const { username } = req.user as IUser
   const { listName } = req.params
   try {
-    const list = await ListModel.getListByUserListName({
+    const list = await ListModel.getList({
       username,
       listName,
     })
@@ -135,6 +138,28 @@ export async function addListItem(
         message: 'Something went wrong',
       })
     }
+  } catch (error) {
+    return res.json({
+      done: false,
+      error: true,
+      message: error.message,
+    })
+  }
+}
+
+export async function getListItems(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+
+  const { listName } = req.params
+  console.log(username, listName)
+  try {
+    const ids = await ListModel.getListBirdIds({ listName, username })
+
+    const birds = await getSpeciesByIds({ birdIds: { ...ids } })
+    return res.json(birds)
   } catch (error) {
     return res.json({
       done: false,

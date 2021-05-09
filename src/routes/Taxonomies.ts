@@ -1,10 +1,6 @@
 import { Response, Request } from 'express'
 import { validationResult } from 'express-validator'
-import {
-  createTaxonomy,
-  getUserTaxonomy,
-  updateTaxonomy,
-} from '../models/taxonomy-models'
+import { createTaxonomy, updateTaxonomy } from '../models/taxonomy-models'
 import { httpStatus, ITaxonomy, IUser } from '../types'
 /**
  *
@@ -12,34 +8,7 @@ import { httpStatus, ITaxonomy, IUser } from '../types'
  * @param res - res
  * @returns - Response Object
  */
-export async function getBirdsCTRL(
-  req: Request,
-  res: Response
-): Promise<Response> {
-  let { listName } = req.params
 
-  listName = listName || ''
-  const { username } = req.user as IUser
-  try {
-    const taxonomies = (await getUserTaxonomy({ username, listName })) || []
-    if (taxonomies?.length >= 0) {
-      return res.status(httpStatus.ok).json(taxonomies)
-    } else {
-      return res.status(httpStatus.badRequest).json({
-        done: false,
-        message: `no list "${listName}" found for User "${username}" `,
-      })
-    }
-  } catch (error) {
-    return res.status(httpStatus.error).json({ done: false })
-  }
-}
-/**
- *
- * @param req - taxonomyName category gender
- * @param res
- * @returns
- */
 export async function createTaxonomyCTRL(
   req: Request,
   res: Response

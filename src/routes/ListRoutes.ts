@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createList, deleteList, getList, getListByName } from './Lists'
+import * as routes from './Lists'
 import { param, body } from 'express-validator'
 import { verifyUser } from '../utils/user-manager'
 import { asyncFn } from '../utils/helpers'
@@ -11,22 +11,22 @@ listRouter.post(
   '/',
   body('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(createList)
+  asyncFn(routes.createList)
 )
 //Delete list by Name
 listRouter.delete(
   '/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(deleteList)
+  asyncFn(routes.deleteList)
 )
-//get all list
-listRouter.get('/', verifyUser, asyncFn(getList))
+//get all list- no pagination is need, because can have only 10 to 20 lists in total
+listRouter.get('/', verifyUser, asyncFn(routes.getList))
 
 //get specific list
 listRouter.get(
   '/list/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(getListByName)
+  asyncFn(routes.getListItems)
 )

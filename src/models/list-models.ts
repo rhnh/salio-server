@@ -16,7 +16,7 @@ export async function create({ username, listName }: IList): Promise<boolean> {
   }
 }
 
-export async function getListUserListName({
+export async function getList({
   username,
   listName,
 }: IList): Promise<IList | null> {
@@ -27,60 +27,39 @@ export async function getListUserListName({
     return null
   }
 }
-export async function getListByUserListName({
+export async function getListBirdIds({
   listName,
   username,
-}: IList): Promise<IList | null> {
+}: IList): Promise<IList[] | []> {
+  console.log(listName, username)
   try {
-    const result = await lists.findOne({ username, listName })
-    return result
+    const birdies = await lists
+      .find({ listName, username })
+      .project({
+        birdIds: 1,
+        _id: 0,
+      })
+      .toArray()
+    console.log(birdies)
+    return birdies
   } catch (error) {
-    return error
-  }
-}
-interface IListProjection {
-  username?: number
-  _id?: number
-  listName?: number
-  birdIds?: number
-}
-export async function getLists(
-  list: IList,
-  project?: IListProjection
-): Promise<IList[] | null> {
-  try {
-    let hasList
-    if (project)
-      hasList = await lists.find(lists, { projection: { ...project } })
-    else hasList = await lists.find(list)
-    return hasList.toArray()
-  } catch (error) {
-    return null
+    console.error(getListBirdIds.name, error)
+    return []
   }
 }
 
-export async function getListItemIds({
-  listName,
-  username,
-}: IList): Promise<IList[] | null> {
-  try {
-    const { birdIds } = await lists.findOne(
-      { username, listName },
-      {
-        projection: { birdIds: 1, _id: 0 },
-      }
-    )
-    return birdIds
-  } catch (error) {
-    return error
-  }
+interface IGetListItems extends IList {
+  page: number
+  perPage: number
 }
 export async function getListItems({
   listName,
   username,
-}: IList): Promise<IList[] | null> {
+  page = 1,
+  perPage = 10,
+}: IGetListItems): Promise<IList[] | null> {
   try {
-    const listItems = await lists.aggregate([
+    const listItems = await lists?.aggregate([
       {
         $match: {
           username,
@@ -97,14 +76,39 @@ export async function getListItems({
       },
       {
         $project: {
-          _id: 1,
-          username: 1,
-          listName: 1,
+          _id: 0,
           birds: 1,
         },
       },
+
+      {
+        $match: {
+          'birds.taxonomyName': {
+            $ne: '',
+          },
+        },
+      },
+      {
+        $match: {
+          'birds.category': new RegExp('species', 'i'),
+        },
+      },
+      {
+        $sort: {
+          'birds.taxonomyName': 1,
+        },
+      },
+      {
+        $limit: 15,
+      },
+      {
+        $skip: perPage * page,
+      },
     ])
-    return listItems.toArray()
+    console.log(await listItems.toArray())
+
+    const temp = (await listItems.toArray()) as IList[]
+    return temp
   } catch (error) {
     return error
   }
