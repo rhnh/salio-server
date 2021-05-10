@@ -1,6 +1,10 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
-import { addUser, findUserByUsername } from '../models/user-models'
+import {
+  addUser,
+  changeUserPassword,
+  findUserByUsername,
+} from '../models/user-models'
 import { httpStatus } from '../types'
 import { generatePassword } from '../utils/password'
 
@@ -40,5 +44,23 @@ export async function registerUser(
         })
   } catch (error) {
     res.json({ statusMessage: 'something went wrong', statusCode: 505 })
+  }
+}
+
+export async function changePassword(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { username, password, newPassword } = req.body
+    const hasChanged = await changeUserPassword({
+      username,
+      password,
+      newPassword,
+    })
+    return res.json({ done: hasChanged })
+  } catch (error) {
+    console.warn('error', changePassword.name)
+    return res.json({ done: false, error: true })
   }
 }
