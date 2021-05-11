@@ -84,6 +84,7 @@ export async function getSpeciesByIds({
       return []
     }
     const objectIds = birdIds.map((b) => new ObjectID(b))
+
     const birds = await taxonomies
       .find({
         _id: {
@@ -101,6 +102,27 @@ export async function getSpeciesByIds({
   }
 }
 
+export async function totalSpecies({ birdIds }: IPage): Promise<number> {
+  try {
+    if (!birdIds || birdIds.length <= 0) {
+      return 0
+    }
+    const objectIds = birdIds.map((b) => new ObjectID(b))
+
+    const total = await taxonomies
+      .find({
+        _id: {
+          $in: objectIds,
+        },
+        category: /species/i,
+      })
+      .count()
+    return total
+  } catch (error) {
+    console.error(totalSpecies.name)
+    return 0
+  }
+}
 export async function getTaxonomy(
   taxonomyName: string,
   taxonomy: string

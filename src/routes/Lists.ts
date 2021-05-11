@@ -5,6 +5,7 @@ import {
   addSpecies,
   getSpeciesByIds,
   getTaxonomy,
+  totalSpecies,
 } from '../models/taxonomy-models'
 import { httpStatus, ITaxonomy, IUser } from '../types'
 
@@ -195,8 +196,9 @@ export async function getListItemsCtrl(
     const birdIds = await ListModel.getListBirdIds({ listName, username })
 
     const birds = await getSpeciesByIds({ birdIds, page: +page })
-
-    return res.json(birds)
+    const total = await totalSpecies({ birdIds })
+    console.log('total', total)
+    return res.json({ birds, total })
   } catch (error) {
     return res.json({
       done: false,
