@@ -51,6 +51,7 @@ export async function createTaxonomyCTRL(
     return res.json(error)
   }
 }
+
 export async function updateTaxonomyCTRL(
   req: Request,
   res: Response

@@ -1,10 +1,15 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import * as ListModel from '../models/list-models'
-import { getSpeciesByIds } from '../models/taxonomy-models'
-import { httpStatus, IUser } from '../types'
+import {
+  addSpecies,
+  getSpeciesByIds,
+  getTaxonomy,
+} from '../models/taxonomy-models'
+import { httpStatus, ITaxonomy, IUser } from '../types'
 
-export async function createList(
+//Create a new list
+export async function createListCtrl(
   req: Request,
   res: Response
 ): Promise<Response | void> {
@@ -43,8 +48,8 @@ export async function createList(
     })
   }
 }
-
-export async function deleteList(
+//Delete specific list
+export async function deleteListCtrl(
   req: Request,
   res: Response
 ): Promise<Response | void> {
@@ -81,7 +86,11 @@ export async function deleteList(
   }
 }
 
-export async function getList(req: Request, res: Response): Promise<Response> {
+//Get all user's lists
+export async function getListCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const { username } = req.user as IUser
 
   try {
@@ -97,7 +106,8 @@ export async function getList(req: Request, res: Response): Promise<Response> {
   }
 }
 
-export async function getListByName(
+//get user's specific list
+export async function getListByNameCtrl(
   req: Request,
   res: Response
 ): Promise<Response> {
@@ -118,15 +128,42 @@ export async function getListByName(
     return error
   }
 }
-
-export async function addListItem(
+//Add specific Specific Taxonomy to user list
+export async function addListItemCtrl(
   req: Request,
   res: Response
 ): Promise<Response> {
   const { username } = req.user as IUser
-  const { listName, taxonomyId } = req.body
+  const { taxonomyName, taxonomy } = req.body
+  const { listName } = req.params
   try {
-    const done = ListModel.createListItem({ username, listName, taxonomyId })
+    const isTaxonomy = await getTaxonomy(taxonomyName, taxonomy)
+
+    const { _id } = ((await isTaxonomy) as ITaxonomy) || ''
+    if (_id) {
+      const done = await ListModel.createListItem({
+        username,
+        listName,
+        taxonomyId: _id,
+      })
+      if (done) {
+        return res.json({
+          done: true,
+          message: 'successfully added',
+        })
+      } else {
+        return res.json({
+          done: false,
+          message: 'Something went wrong',
+        })
+      }
+    }
+    const taxonomyId = await addSpecies(taxonomyName, taxonomy)
+    const done = await ListModel.createListItem({
+      username,
+      listName,
+      taxonomyId,
+    })
     if (done) {
       return res.json({
         done: true,
@@ -147,18 +184,18 @@ export async function addListItem(
   }
 }
 
-export async function getListItems(
+export async function getListItemsCtrl(
   req: Request,
   res: Response
 ): Promise<Response> {
   const { username } = req.user as IUser
 
-  const { listName } = req.params
-  console.log(username, listName)
+  const { listName, page } = req.params
   try {
-    const ids = await ListModel.getListBirdIds({ listName, username })
+    const birdIds = await ListModel.getListBirdIds({ listName, username })
 
-    const birds = await getSpeciesByIds({ birdIds: { ...ids } })
+    const birds = await getSpeciesByIds({ birdIds, page: +page })
+
     return res.json(birds)
   } catch (error) {
     return res.json({

@@ -18,7 +18,6 @@ export async function registerUser(
       return res.status(400).json({ errors: errors.array() })
     }
     const { username, password } = req.body
-    console.log(username, password)
     const usernameTaken = await findUserByUsername(username)
 
     if (usernameTaken) {

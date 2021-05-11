@@ -1,4 +1,4 @@
-import { Collection } from 'mongodb'
+import { Collection, ObjectID } from 'mongodb'
 import { IList } from '../types'
 
 let lists: Collection
@@ -30,18 +30,18 @@ export async function getList({
 export async function getListBirdIds({
   listName,
   username,
-}: IList): Promise<IList[] | []> {
-  console.log(listName, username)
+}: IList): Promise<string[]> {
   try {
-    const birdies = await lists
+    const birdIdsArray = await lists
       .find({ listName, username })
       .project({
         birdIds: 1,
         _id: 0,
       })
       .toArray()
-    console.log(birdies)
-    return birdies
+
+    const { birdIds } = birdIdsArray[0]
+    return birdIds
   } catch (error) {
     console.error(getListBirdIds.name, error)
     return []
@@ -105,7 +105,6 @@ export async function getListItems({
         $skip: perPage * page,
       },
     ])
-    console.log(await listItems.toArray())
 
     const temp = (await listItems.toArray()) as IList[]
     return temp
@@ -169,16 +168,19 @@ export async function getListsByUsername({
   }
 }
 interface IAddItem {
-  taxonomyId: string
+  taxonomyId?: string
   listName: string
   username: string
 }
 export async function createListItem(param: IAddItem): Promise<boolean> {
   const { username, listName, taxonomyId } = param
   try {
+    if (!taxonomyId) {
+      return false
+    }
     const isAdd = await lists.updateOne(
       { username, listName },
-      { $push: { birdIds: taxonomyId } }
+      { $push: { birdIds: new ObjectID(taxonomyId) } }
     )
     if (isAdd.upsertedId) {
       return true
