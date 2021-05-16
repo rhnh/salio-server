@@ -29,6 +29,15 @@ listRouter.get(
   verifyUser,
   asyncFn(routes.getListItemsCtrl)
 )
+
+//get Total list
+listRouter.get(
+  '/list/total-items/:listName/',
+  verifyUser,
+  asyncFn(routes.getTotalItemsCtrl)
+)
+
+//Add new Taxonomy to the list
 listRouter.post(
   '/list/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),

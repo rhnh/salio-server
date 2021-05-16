@@ -108,7 +108,6 @@ export async function totalSpecies({ birdIds }: IPage): Promise<number> {
       return 0
     }
     const objectIds = birdIds.map((b) => new ObjectID(b))
-
     const total = await taxonomies
       .find({
         _id: {

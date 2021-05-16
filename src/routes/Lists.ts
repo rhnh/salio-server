@@ -93,7 +93,6 @@ export async function getListCtrl(
   res: Response
 ): Promise<Response> {
   const { username } = req.user as IUser
-
   try {
     const allLists = await ListModel.getListsByUsername({ username })
     if (allLists) {
@@ -184,7 +183,7 @@ export async function addListItemCtrl(
     })
   }
 }
-
+//Get all items for specific username and listName
 export async function getListItemsCtrl(
   req: Request,
   res: Response
@@ -194,11 +193,28 @@ export async function getListItemsCtrl(
   const { listName, page } = req.params
   try {
     const birdIds = await ListModel.getListBirdIds({ listName, username })
-
     const birds = await getSpeciesByIds({ birdIds, page: +page })
+    return res.json(birds)
+  } catch (error) {
+    return res.json({
+      done: false,
+      error: true,
+      message: error.message,
+    })
+  }
+}
+
+export async function getTotalItemsCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+
+  const { listName } = req.params
+  try {
+    const birdIds = await ListModel.getListBirdIds({ listName, username })
     const total = await totalSpecies({ birdIds })
-    console.log('total', total)
-    return res.json({ birds, total })
+    return res.json({ total })
   } catch (error) {
     return res.json({
       done: false,
