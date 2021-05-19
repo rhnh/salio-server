@@ -8,7 +8,7 @@ import { createAccountLimiter } from '../utils/basic-manager'
 import { generateToken, verifyUser } from '../utils/user-manager'
 
 export const userRouter = Router()
-
+//signup
 userRouter.post(
   '/',
   createAccountLimiter,
@@ -16,15 +16,14 @@ userRouter.post(
   body('password').not().isEmpty().trim().isLength({ min: 3 }),
   asyncFn(registerUser)
 )
-
+//login
 userRouter.post('/user', passport.authenticate('local'), (req, res) => {
   if (req.user) {
     const token = generateToken(req.user as IUser)
     res.status(httpStatus.ok)
     return res.json(token)
   } else {
-    res.status(httpStatus.badRequest)
-    return res.json({
+    return res.sendStatus(httpStatus.badRequest).json({
       failed: true,
       username: req.user,
     })

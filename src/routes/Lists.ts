@@ -3,7 +3,6 @@ import { validationResult } from 'express-validator'
 import * as ListModel from '../models/list-models'
 import {
   addSpecies,
-  getSpeciesByIds,
   getTaxonomy,
   totalSpecies,
 } from '../models/taxonomy-models'
@@ -21,6 +20,8 @@ export async function createListCtrl(
       listName,
       username,
     })
+
+    console.log(username, listName, 'oh lala')
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -32,7 +33,7 @@ export async function createListCtrl(
     }
     const hasList = await ListModel.create({ username, listName })
     if (hasList) {
-      return res.json({
+      return res.status(200).json({
         message: `Successfully added ${listName}`,
         done: true,
         user: req.user,
@@ -134,8 +135,9 @@ export async function addListItemCtrl(
   res: Response
 ): Promise<Response> {
   const { username } = req.user as IUser
-  const { taxonomyName, taxonomy } = req.body
+  const { taxonomyName, taxonomy, location } = req.body
   const { listName } = req.params
+  console.log('something wrong', addListItemCtrl.name)
   try {
     const isTaxonomy = await getTaxonomy(taxonomyName, taxonomy)
 
@@ -145,6 +147,7 @@ export async function addListItemCtrl(
         username,
         listName,
         taxonomyId: _id,
+        location,
       })
       if (done) {
         return res.json({
@@ -158,11 +161,12 @@ export async function addListItemCtrl(
         })
       }
     }
-    const taxonomyId = await addSpecies(taxonomyName, taxonomy)
+    const taxonomyId = await addSpecies(taxonomyName, taxonomy, location)
     const done = await ListModel.createListItem({
       username,
       listName,
       taxonomyId,
+      location,
     })
     if (done) {
       return res.json({
@@ -190,10 +194,11 @@ export async function getListItemsCtrl(
 ): Promise<Response> {
   const { username } = req.user as IUser
 
-  const { listName, page } = req.params
+  const { listName } = req.params
   try {
-    const birdIds = await ListModel.getListBirdIds({ listName, username })
-    const birds = await getSpeciesByIds({ birdIds, page: +page })
+    // const birdIds = await ListModel.getListBirdIds({ listName, username })
+    // const birds = await getSpeciesByIds({ listName, username })
+    const birds = await ListModel.getListItems({ listName, username })
     return res.json(birds)
   } catch (error) {
     return res.json({

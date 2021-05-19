@@ -1,4 +1,4 @@
-import { ISalioResponse, ITaxonomy } from '../types'
+import { IList, ISalioResponse, ITaxonomy } from '../types'
 
 import { Collection, ObjectID } from 'mongodb'
 
@@ -76,25 +76,27 @@ interface IPage {
   birdIds: string[]
 }
 export async function getSpeciesByIds({
-  page = 0,
-  birdIds,
-}: IPage): Promise<ITaxonomy[] | []> {
+  username,
+  listName,
+}: IList): Promise<ITaxonomy[] | []> {
   try {
-    if (!birdIds || birdIds.length <= 0) {
-      return []
-    }
-    const objectIds = birdIds.map((b) => new ObjectID(b))
-
-    const birds = await taxonomies
-      .find({
-        _id: {
-          $in: objectIds,
+    const birds = await taxonomies.aggregate([
+      {
+        $match: {
+          listName,
+          username,
         },
-        category: /species/i,
-      })
-      .skip(page * 15)
-      .limit(15)
-
+      },
+      {
+        $lookup: {
+          from: 'taxonomies',
+          localField: 'birdIds.birdId',
+          foreignField: '_id',
+          as: 'string',
+        },
+      },
+    ])
+    console.log(await birds.toArray())
     return await birds.toArray()
   } catch (error) {
     console.log('something went wrong', getSpeciesByIds.name, error)
@@ -140,14 +142,17 @@ export async function getTaxonomy(
 
 export async function addSpecies(
   taxonomyName: string,
-  taxonomy: string
+  taxonomy: string,
+  location: string
 ): Promise<string> {
   try {
     const isTaxonomy = await taxonomies.insertOne({
       taxonomy,
       taxonomyName,
       category: 'species',
+      location,
     })
+    console.log(isTaxonomy.insertedId)
     return isTaxonomy.insertedId
   } catch (error) {
     console.log('error', getTaxonomy.name)

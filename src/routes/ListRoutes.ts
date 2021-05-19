@@ -23,7 +23,7 @@ listRouter.delete(
 //get all list- no pagination is need, because can have only 10 to 20 lists in total
 listRouter.get('/', verifyUser, asyncFn(routes.getListCtrl))
 
-//get specific list
+//get specific list with items
 listRouter.get(
   '/list/:listName/page/:page',
   verifyUser,
@@ -32,7 +32,9 @@ listRouter.get(
 
 //get Total list
 listRouter.get(
-  '/list/total-items/:listName/',
+  '/list/total-items/:listName',
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
+
   verifyUser,
   asyncFn(routes.getTotalItemsCtrl)
 )
@@ -41,9 +43,13 @@ listRouter.get(
 listRouter.post(
   '/list/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
-  body(['taxonomyName', 'taxonomy']).not().isEmpty().trim().isLength({
-    min: 3,
-  }),
+  body(['taxonomyName', 'taxonomy', 'location'])
+    .not()
+    .isEmpty()
+    .trim()
+    .isLength({
+      min: 3,
+    }),
   verifyUser,
   asyncFn(routes.addListItemCtrl)
 )

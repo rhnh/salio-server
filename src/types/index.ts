@@ -87,3 +87,12 @@ export interface RHParams {
   message: string
   status: boolean
 }
+
+export interface IListTaxonomy {
+  birdIds: [
+    {
+      birdId: string
+      seenAt: string
+    }
+  ]
+}

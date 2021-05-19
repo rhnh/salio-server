@@ -9,7 +9,11 @@ export function setList(collection: Collection): void {
 
 export async function create({ username, listName }: IList): Promise<boolean> {
   try {
-    const newList = await lists.insertOne({ username, listName })
+    const newList = await lists.insertOne({
+      username,
+      listName,
+      createAt: Date.now(),
+    })
     return newList.result.n === 1
   } catch (error) {
     return false
@@ -48,66 +52,93 @@ export async function getListBirdIds({
   }
 }
 
-interface IGetListItems extends IList {
-  page: number
-  perPage: number
-}
+// interface IGetListItems extends IList {
+//   page: number
+//   perPage: number
+// }
 export async function getListItems({
   listName,
   username,
-  page = 1,
-  perPage = 10,
-}: IGetListItems): Promise<IList[] | null> {
+}: // page = 1,
+// perPage = 10,
+IList): Promise<IList[] | null> {
   try {
     const listItems = await lists?.aggregate([
       {
         $match: {
-          username,
           listName,
+          username,
         },
       },
       {
         $lookup: {
           from: 'taxonomies',
-          localField: 'birdIds',
+          localField: 'birdIds.birdId',
           foreignField: '_id',
           as: 'birds',
         },
       },
       {
-        $project: {
-          _id: 0,
-          birds: 1,
+        $unwind: {
+          path: '$birds',
         },
       },
-
       {
-        $match: {
-          'birds.taxonomyName': {
-            $ne: '',
+        $unwind: {
+          path: '$birdIds',
+        },
+      },
+      {
+        $group: {
+          _id: '$_id',
+          birds: {
+            $push: {
+              $cond: [
+                {
+                  $eq: ['$birds._id', '$birdIds.birdId'],
+                },
+                {
+                  id: '$birds._id',
+                  listName: '$birds.taxonomy',
+                  seen: '$birdIds.seen',
+                  species: '$birds.taxonomyName',
+                  location: '$birds.location',
+                },
+                null,
+              ],
+            },
           },
         },
       },
       {
+        $unwind: {
+          path: '$birds',
+        },
+      },
+      {
         $match: {
-          'birds.category': new RegExp('species', 'i'),
+          birds: {
+            $exists: true,
+            $ne: null,
+          },
         },
       },
       {
-        $sort: {
-          'birds.taxonomyName': 1,
+        $group: {
+          _id: {
+            id: '$birds.id',
+            listName: '$birds.listName',
+            seen: '$birds.seen',
+            species: '$birds.species',
+          },
         },
-      },
-      {
-        $limit: 15,
-      },
-      {
-        $skip: perPage * page,
       },
     ])
 
-    const temp = (await listItems.toArray()) as IList[]
-    return temp
+    const temp = await await listItems.toArray()
+    const f = temp.map((f) => f._id)
+
+    return f
   } catch (error) {
     return error
   }
@@ -158,6 +189,7 @@ export async function getListsByUsername({
             username: 1,
             _id: 1,
             listName: 1,
+            createAt: 1,
           },
         }
       )
@@ -171,16 +203,25 @@ interface IAddItem {
   taxonomyId?: string
   listName: string
   username: string
+  location: string
 }
 export async function createListItem(param: IAddItem): Promise<boolean> {
-  const { username, listName, taxonomyId } = param
+  const { username, listName, taxonomyId, location } = param
   try {
     if (!taxonomyId) {
       return false
     }
     const isAdd = await lists.updateOne(
       { username, listName },
-      { $push: { birdIds: new ObjectID(taxonomyId) } }
+      {
+        $push: {
+          birdIds: {
+            birdId: new ObjectID(taxonomyId),
+            location,
+            seen: Date.now(),
+          },
+        },
+      }
     )
     if (isAdd.upsertedId) {
       return true
