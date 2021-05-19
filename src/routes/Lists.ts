@@ -1,11 +1,7 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import * as ListModel from '../models/list-models'
-import {
-  addSpecies,
-  getTaxonomy,
-  totalSpecies,
-} from '../models/taxonomy-models'
+import { addSpecies, getTaxonomy } from '../models/taxonomy-models'
 import { httpStatus, ITaxonomy, IUser } from '../types'
 
 //Create a new list
@@ -21,7 +17,6 @@ export async function createListCtrl(
       username,
     })
 
-    console.log(username, listName, 'oh lala')
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -137,7 +132,6 @@ export async function addListItemCtrl(
   const { username } = req.user as IUser
   const { taxonomyName, taxonomy, location } = req.body
   const { listName } = req.params
-  console.log('something wrong', addListItemCtrl.name)
   try {
     const isTaxonomy = await getTaxonomy(taxonomyName, taxonomy)
 
@@ -217,8 +211,8 @@ export async function getTotalItemsCtrl(
 
   const { listName } = req.params
   try {
-    const birdIds = await ListModel.getListBirdIds({ listName, username })
-    const total = await totalSpecies({ birdIds })
+    const total = await ListModel.getTotalItems({ listName, username })
+
     return res.json({ total })
   } catch (error) {
     return res.json({

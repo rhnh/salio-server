@@ -1,6 +1,6 @@
 import { IList, ISalioResponse, ITaxonomy } from '../types'
 
-import { Collection, ObjectID } from 'mongodb'
+import { Collection } from 'mongodb'
 
 let taxonomies: Collection
 
@@ -71,10 +71,7 @@ export async function updateTaxonomy(
     }
   }
 }
-interface IPage {
-  page?: number
-  birdIds: string[]
-}
+
 export async function getSpeciesByIds({
   username,
   listName,
@@ -96,7 +93,6 @@ export async function getSpeciesByIds({
         },
       },
     ])
-    console.log(await birds.toArray())
     return await birds.toArray()
   } catch (error) {
     console.log('something went wrong', getSpeciesByIds.name, error)
@@ -104,26 +100,6 @@ export async function getSpeciesByIds({
   }
 }
 
-export async function totalSpecies({ birdIds }: IPage): Promise<number> {
-  try {
-    if (!birdIds || birdIds.length <= 0) {
-      return 0
-    }
-    const objectIds = birdIds.map((b) => new ObjectID(b))
-    const total = await taxonomies
-      .find({
-        _id: {
-          $in: objectIds,
-        },
-        category: /species/i,
-      })
-      .count()
-    return total
-  } catch (error) {
-    console.error(totalSpecies.name)
-    return 0
-  }
-}
 export async function getTaxonomy(
   taxonomyName: string,
   taxonomy: string
@@ -152,7 +128,6 @@ export async function addSpecies(
       category: 'species',
       location,
     })
-    console.log(isTaxonomy.insertedId)
     return isTaxonomy.insertedId
   } catch (error) {
     console.log('error', getTaxonomy.name)

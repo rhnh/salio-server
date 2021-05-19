@@ -31,24 +31,16 @@ export async function getList({
     return null
   }
 }
-export async function getListBirdIds({
+export async function getTotalItems({
   listName,
   username,
-}: IList): Promise<string[]> {
+}: IList): Promise<number> {
   try {
-    const birdIdsArray = await lists
-      .find({ listName, username })
-      .project({
-        birdIds: 1,
-        _id: 0,
-      })
-      .toArray()
-
-    const { birdIds } = birdIdsArray[0]
-    return birdIds
+    const listCount = await getListItems({ listName, username })
+    return listCount?.length || 0
   } catch (error) {
-    console.error(getListBirdIds.name, error)
-    return []
+    console.error(getTotalItems.name, error)
+    return 0
   }
 }
 
