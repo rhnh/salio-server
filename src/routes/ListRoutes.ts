@@ -53,3 +53,11 @@ listRouter.post(
   verifyUser,
   asyncFn(routes.addListItemCtrl)
 )
+
+listRouter.delete(
+  '/list/:listName/bird/:taxonomyId',
+  param('taxonomyId').not().isEmpty().trim().isLength({ min: 3 }),
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
+  verifyUser,
+  asyncFn(routes.removeItemsCtrl)
+)

@@ -191,13 +191,13 @@ export async function getListsByUsername({
     return error
   }
 }
-interface IAddItem {
+interface IParam {
   taxonomyId?: string
   listName: string
   username: string
-  location: string
+  location?: string
 }
-export async function createListItem(param: IAddItem): Promise<boolean> {
+export async function createListItem(param: IParam): Promise<boolean> {
   const { username, listName, taxonomyId, location } = param
   try {
     if (!taxonomyId) {
@@ -219,6 +219,27 @@ export async function createListItem(param: IAddItem): Promise<boolean> {
       return true
     }
     return false
+  } catch (error) {
+    return false
+  }
+}
+export async function removeListItem(param: IParam): Promise<boolean> {
+  const { username, listName, taxonomyId } = param
+  try {
+    if (!taxonomyId) {
+      return false
+    }
+    const isAdd = await lists.updateOne(
+      { username, listName },
+      {
+        $pull: {
+          birdIds: {
+            birdId: new ObjectID(taxonomyId),
+          },
+        },
+      }
+    )
+    return isAdd.upsertedCount === 1
   } catch (error) {
     return false
   }

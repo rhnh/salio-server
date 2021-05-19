@@ -222,3 +222,26 @@ export async function getTotalItemsCtrl(
     })
   }
 }
+
+export async function removeItemsCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+
+  const { listName, taxonomyId } = req.params
+  try {
+    const done = await ListModel.removeListItem({
+      listName,
+      username,
+      taxonomyId,
+    })
+    return res.json({ done, message: 'successfully delete it' })
+  } catch (error) {
+    return res.json({
+      done: false,
+      error: true,
+      message: error.message,
+    })
+  }
+}
