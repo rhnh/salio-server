@@ -188,12 +188,19 @@ export async function getListItemsCtrl(
 ): Promise<Response> {
   const { username } = req.user as IUser
 
-  const { listName } = req.params
+  const { listName, page = 0, perPage = 10 } = req.params
   try {
-    // const birdIds = await ListModel.getListBirdIds({ listName, username })
-    // const birds = await getSpeciesByIds({ listName, username })
-    const birds = await ListModel.getListItems({ listName, username })
-    return res.json(birds)
+    const birds = await ListModel.getListItems({
+      listName,
+      username,
+    })
+
+    return res.json(
+      birds
+        .limit(+perPage || 10)
+        .skip(+page)
+        .toArray()
+    )
   } catch (error) {
     return res.json({
       done: false,

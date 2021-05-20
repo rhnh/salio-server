@@ -1,5 +1,5 @@
-import { Collection, ObjectID } from 'mongodb'
-import { IList } from '../types'
+import { Cursor, Collection, ObjectID } from 'mongodb'
+import { IList, ITaxonomy } from '../types'
 
 let lists: Collection
 
@@ -36,7 +36,7 @@ export async function getTotalItems({
   username,
 }: IList): Promise<number> {
   try {
-    const listCount = await getListItems({ listName, username })
+    const listCount = await (await getListItems({ listName, username })).toArray
     return listCount?.length || 0
   } catch (error) {
     console.error(getTotalItems.name, error)
@@ -44,18 +44,10 @@ export async function getTotalItems({
   }
 }
 
-// interface IGetListItems extends IList {
-//   page: number
-//   perPage: number
-// }
-export async function getListItems({
-  listName,
-  username,
-}: // page = 1,
-// perPage = 10,
-IList): Promise<IList[] | null> {
+export async function getListItems(param: IList): Promise<Cursor> {
+  const { username, listName } = param
   try {
-    const listItems = await lists?.aggregate([
+    const listItems = lists?.aggregate([
       {
         $match: {
           listName,
@@ -91,10 +83,11 @@ IList): Promise<IList[] | null> {
                 },
                 {
                   id: '$birds._id',
-                  listName: '$birds.taxonomy',
+                  listName: '$birds.name',
                   seen: '$birdIds.seen',
-                  species: '$birds.taxonomyName',
+                  taxonomy: '$birds.taxonomy',
                   location: '$birds.location',
+                  taxonomyName: '$birds.taxonomyName',
                 },
                 null,
               ],
@@ -121,16 +114,25 @@ IList): Promise<IList[] | null> {
             id: '$birds.id',
             listName: '$birds.listName',
             seen: '$birds.seen',
-            species: '$birds.species',
+            taxonomy: '$birds.taxonomy',
+            taxonomyName: '$birds.taxonomyName',
           },
+        },
+      },
+      {
+        $project: {
+          birds: '$_id',
+          _id: 0,
+        },
+      },
+      {
+        $sort: {
+          taxonomyName: 1,
         },
       },
     ])
 
-    const temp = await await listItems.toArray()
-    const f = temp.map((f) => f._id)
-
-    return f
+    return listItems
   } catch (error) {
     return error
   }
@@ -229,7 +231,7 @@ export async function removeListItem(param: IParam): Promise<boolean> {
     if (!taxonomyId) {
       return false
     }
-    const isAdd = await lists.updateOne(
+    const hasRemoved = await lists.updateOne(
       { username, listName },
       {
         $pull: {
@@ -239,7 +241,7 @@ export async function removeListItem(param: IParam): Promise<boolean> {
         },
       }
     )
-    return isAdd.upsertedCount === 1
+    return hasRemoved.result.ok === 1
   } catch (error) {
     return false
   }
