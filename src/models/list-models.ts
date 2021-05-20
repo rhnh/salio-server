@@ -1,5 +1,5 @@
 import { Cursor, Collection, ObjectID } from 'mongodb'
-import { IList, ITaxonomy } from '../types'
+import { IList } from '../types'
 
 let lists: Collection
 
@@ -127,7 +127,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
       },
       {
         $sort: {
-          taxonomyName: 1,
+          'birds.seen': -1,
         },
       },
     ])

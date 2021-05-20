@@ -194,13 +194,12 @@ export async function getListItemsCtrl(
       listName,
       username,
     })
-
-    return res.json(
-      birds
-        .limit(+perPage || 10)
-        .skip(+page)
-        .toArray()
-    )
+    const result = await birds
+      .limit(+perPage || 10)
+      .skip(+page)
+      .toArray()
+    console.log(result, 'ahhaah')
+    return res.json(result)
   } catch (error) {
     return res.json({
       done: false,
