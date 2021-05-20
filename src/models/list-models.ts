@@ -126,8 +126,16 @@ export async function getListItems(param: IList): Promise<Cursor> {
         },
       },
       {
+        $project: {
+          _id: '$birds.id',
+          seen: '$birds.seen',
+          taxonomy: '$birds.taxonomy',
+          taxonomyName: '$birds.taxonomyName',
+        },
+      },
+      {
         $sort: {
-          'birds.seen': -1,
+          taxonomyName: 1,
         },
       },
     ])

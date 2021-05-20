@@ -198,7 +198,7 @@ export async function getListItemsCtrl(
       .limit(+perPage || 10)
       .skip(+page)
       .toArray()
-    console.log(result, 'ahhaah')
+
     return res.json(result)
   } catch (error) {
     return res.json({
