@@ -1,6 +1,10 @@
 import { Response, Request } from 'express'
 import { validationResult } from 'express-validator'
-import { createTaxonomy, updateTaxonomy } from '../models/taxonomy-models'
+import {
+  createTaxonomy,
+  getTaxonomies,
+  updateTaxonomy,
+} from '../models/taxonomy-models'
 import { httpStatus, ITaxonomy, IUser } from '../types'
 /**
  *
@@ -92,6 +96,26 @@ export async function updateTaxonomyCTRL(
         message: `${t1} has been added!`,
         birdId: hasItem.data,
       })
+    }
+    return res.status(httpStatus.badRequest).json({ done: false })
+  } catch (error) {
+    return res.json(error)
+  }
+}
+export async function getTaxonomiesCtr(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
+    const isTaxonomies = await getTaxonomies()
+
+    if (isTaxonomies.length > 0) {
+      return res.status(httpStatus.ok).json(isTaxonomies)
     }
     return res.status(httpStatus.badRequest).json({ done: false })
   } catch (error) {

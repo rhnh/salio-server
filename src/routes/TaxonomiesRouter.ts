@@ -1,8 +1,9 @@
 import { Router } from 'express'
-import { body, param } from 'express-validator'
+import { body } from 'express-validator'
+
 import { asyncFn } from '../utils/helpers'
 import { verifyUser } from '../utils/user-manager'
-import { createTaxonomyCTRL } from './Taxonomies'
+import { createTaxonomyCTRL, getTaxonomiesCtr } from './Taxonomies'
 
 export const taxonomyRouter = Router()
 /**
@@ -27,7 +28,5 @@ taxonomyRouter.post(
   verifyUser,
   asyncFn(createTaxonomyCTRL)
 )
-taxonomyRouter.get(
-  '/taxonomies/:taxonomyName',
-  param('taxonomyName').not().isEmpty().trim().isLength({ min: 3 })
-)
+
+taxonomyRouter.get('/', verifyUser, getTaxonomiesCtr)

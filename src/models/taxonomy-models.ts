@@ -134,3 +134,19 @@ export async function addSpecies(
     return ''
   }
 }
+export async function getTaxonomies(): Promise<ITaxonomy[]> {
+  try {
+    const isTaxonomy = await taxonomies
+      .find({
+        approved: true,
+      })
+      .project({
+        taxonomyName: 1,
+      })
+
+    return isTaxonomy.toArray()
+  } catch (error) {
+    console.log('error', getTaxonomy.name)
+    return []
+  }
+}
