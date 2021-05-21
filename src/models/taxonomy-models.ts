@@ -142,6 +142,7 @@ export async function getTaxonomies(): Promise<ITaxonomy[]> {
       })
       .project({
         taxonomyName: 1,
+        taxonomy: 1,
       })
 
     return isTaxonomy.toArray()
