@@ -2,7 +2,8 @@ import cors from 'cors'
 import express from 'express'
 import { Application, Response } from 'express'
 import path from 'path'
-import { setup } from './setup'
+
+import { setup } from './settings'
 
 export const app: Application = express()
 

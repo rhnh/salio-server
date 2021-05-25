@@ -9,5 +9,5 @@
     "**/.DS_Store": true,
     "**/node_modules/**": true
   },
-  "workbench.colorTheme": "Ysgrifennwr"
+  "workbench.colorTheme": "Gruvbox Material Dark"
 }

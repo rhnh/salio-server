@@ -7,8 +7,13 @@ import { isVerifiedPass } from './password'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
 import { findUserById, findUserByUsername } from '../models/user-models'
+import { genKeyPair } from '../key-gen'
+
 const PUBLIC_KEY_PATH = path.join(__dirname, '..', 'id_rsa_pub.pem')
 const PRIVATE_KEY_PATH = path.join(__dirname, '..', 'id_rsa_priv.pem')
+if (!fs.existsSync(PUBLIC_KEY_PATH) || !fs.existsSync(PRIVATE_KEY_PATH)) {
+  genKeyPair()
+}
 const PUBLIC_KEY = fs.readFileSync(PUBLIC_KEY_PATH, 'utf-8')
 const PRIVATE_KEY = fs.readFileSync(PRIVATE_KEY_PATH, 'utf-8')
 
