@@ -9,6 +9,7 @@ import errorHandler from 'errorhandler'
 import { authentication, authorization } from './utils/user-manager'
 import passport from 'passport'
 import cors from 'cors'
+
 export function setup(app: Application): void {
   app.use(helmet())
   const allowedOrigins = {
@@ -22,6 +23,8 @@ export function setup(app: Application): void {
   app.use(json())
   authorization()
   authentication()
+
+
   app.use(passport.initialize())
   //Routers
   app.use('/api', AppRouter)

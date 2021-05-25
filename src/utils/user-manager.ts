@@ -11,6 +11,7 @@ const PUBLIC_KEY_PATH = path.join(__dirname, '..', 'id_rsa_pub.pem')
 const PRIVATE_KEY_PATH = path.join(__dirname, '..', 'id_rsa_priv.pem')
 const PUBLIC_KEY = fs.readFileSync(PUBLIC_KEY_PATH, 'utf-8')
 const PRIVATE_KEY = fs.readFileSync(PRIVATE_KEY_PATH, 'utf-8')
+
 export const authentication = (): void => {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
