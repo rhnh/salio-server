@@ -116,6 +116,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
             seen: '$birds.seen',
             taxonomy: '$birds.taxonomy',
             taxonomyName: '$birds.taxonomyName',
+            location: '$birds.location',
           },
         },
       },
@@ -131,6 +132,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
           seen: '$birds.seen',
           taxonomy: '$birds.taxonomy',
           taxonomyName: '$birds.taxonomyName',
+          location: '$birds.location',
         },
       },
       {
@@ -192,6 +194,7 @@ export async function getListsByUsername({
             _id: 1,
             listName: 1,
             createAt: 1,
+            location: 1,
           },
         }
       )

@@ -132,6 +132,12 @@ export async function addListItemCtrl(
   const { username } = req.user as IUser
   const { taxonomyName, taxonomy, location } = req.body
   const { listName } = req.params
+  if (taxonomyName === '' || taxonomy === '') {
+    res.status(409)
+    return res.json({
+      message: httpStatus.badRequest,
+    })
+  }
   try {
     const isTaxonomy = await getTaxonomy(taxonomyName, taxonomy)
 

@@ -43,13 +43,12 @@ listRouter.get(
 listRouter.post(
   '/list/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
-  body(['taxonomyName', 'taxonomy', 'location'])
-    .not()
-    .isEmpty()
-    .trim()
-    .isLength({
-      min: 3,
-    }),
+  body('taxonomyName').not().isEmpty().trim().isLength({
+    min: 3,
+  }),
+  body('taxonomy').not().isEmpty().trim().isLength({
+    min: 3,
+  }),
   verifyUser,
   asyncFn(routes.addListItemCtrl)
 )

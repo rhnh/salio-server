@@ -2,7 +2,7 @@ import { config } from "dotenv";
 config();
 export const TEST_URI: string = process.env.TEST_URI
   ? process.env.TEST_URI
-  : "mongodb://localhost:27017/testSalio";
+  : "mongodb://localhost:27017?authSource=admin";
 
 export const TEST_DB_NAME: string = process.env.TEST_DB_NAME
   ? process.env.TEST_DB_NAME
@@ -10,7 +10,7 @@ export const TEST_DB_NAME: string = process.env.TEST_DB_NAME
 
 export const URI: string = process.env.URI
   ? process.env.URI
-  : "mongodb://localhost:27017";
+  : "mongodb://localhost:27017?authSource=admin";
 
 export const DB_NAME: string = process.env.TEST_DB_NAME
   ? process.env.TEST_DB_NAME

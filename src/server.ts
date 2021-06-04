@@ -36,8 +36,10 @@ export async function server(app: Application): Promise<void> {
       console.error('cannot set the collection')
       process.exit(1)
     }
-  } catch (error) {
-    console.error('cannot connect the database')
+  } catch (error) { 
+    console.log(URI,DB_NAME)
+    console.log(error);
+    console.error('cannot connect the database! ')
     process.exit(1)
   }
 }
