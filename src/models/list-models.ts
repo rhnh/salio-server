@@ -36,7 +36,9 @@ export async function getTotalItems({
   username,
 }: IList): Promise<number> {
   try {
-    const listCount = await (await getListItems({ listName, username })).toArray
+    const listCount = await (
+      await getListItems({ listName, username })
+    ).toArray()
     return listCount?.length || 0
   } catch (error) {
     console.error(getTotalItems.name, error)
