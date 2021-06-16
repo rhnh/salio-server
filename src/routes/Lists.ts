@@ -212,6 +212,33 @@ export async function getListItemsCtrl(
     })
   }
 }
+//Get item for specific username and listName
+export async function getListItemByIdCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+
+  const { listName, id } = req.params
+  try {
+    const birds = await ListModel.getListItems({
+      listName,
+      username,
+    })
+
+    const result = await await birds.toArray()
+    const bird = result.find((bird) => {
+      return bird._id.toString() === id
+    })
+    return res.json(bird)
+  } catch (error) {
+    return res.json({
+      done: false,
+      error: true,
+      message: error.message,
+    })
+  }
+}
 
 export async function getTotalItemsCtrl(
   req: Request,

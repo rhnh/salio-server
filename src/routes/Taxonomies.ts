@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator'
 import {
   createTaxonomy,
   getTaxonomies,
+  getTaxonomySpecies,
   updateTaxonomy,
 } from '../models/taxonomy-models'
 import { httpStatus, ITaxonomy, IUser } from '../types'
@@ -113,6 +114,26 @@ export async function getTaxonomiesCtr(
     }
 
     const isTaxonomies = await getTaxonomies()
+
+    if (isTaxonomies.length > 0) {
+      return res.status(httpStatus.ok).json(isTaxonomies)
+    }
+    return res.status(httpStatus.badRequest).json({ done: false })
+  } catch (error) {
+    return res.json(error)
+  }
+}
+export async function getTaxonomySpeciesCtr(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
+    const isTaxonomies = await getTaxonomySpecies()
 
     if (isTaxonomies.length > 0) {
       return res.status(httpStatus.ok).json(isTaxonomies)

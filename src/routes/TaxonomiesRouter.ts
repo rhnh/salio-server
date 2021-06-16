@@ -3,7 +3,11 @@ import { body } from 'express-validator'
 
 import { asyncFn } from '../utils/helpers'
 import { verifyUser } from '../utils/user-manager'
-import { createTaxonomyCTRL, getTaxonomiesCtr } from './Taxonomies'
+import {
+  createTaxonomyCTRL,
+  getTaxonomiesCtr,
+  getTaxonomySpeciesCtr,
+} from './Taxonomies'
 
 export const taxonomyRouter = Router()
 /**
@@ -24,9 +28,11 @@ taxonomyRouter.post(
   '/',
   body(['taxonomy', 'category']).not().isEmpty().trim().isLength({ min: 3 }),
   body('ancestors').isArray(),
-
   verifyUser,
   asyncFn(createTaxonomyCTRL)
 )
 
 taxonomyRouter.get('/', verifyUser, getTaxonomiesCtr)
+taxonomyRouter.get('/species', verifyUser, getTaxonomySpeciesCtr)
+
+taxonomyRouter.get('/taxonomy/:taxonomyId', verifyUser)

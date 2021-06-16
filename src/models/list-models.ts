@@ -1,6 +1,5 @@
 import { Cursor, Collection, ObjectID } from 'mongodb'
 import { IList } from '../types'
-
 let lists: Collection
 
 export function setList(collection: Collection): void {
@@ -90,6 +89,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
                   taxonomy: '$birds.taxonomy',
                   location: '$birds.location',
                   taxonomyName: '$birds.taxonomyName',
+                  slug: '$birds.slug',
                 },
                 null,
               ],
@@ -119,6 +119,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
             taxonomy: '$birds.taxonomy',
             taxonomyName: '$birds.taxonomyName',
             location: '$birds.location',
+            slug: '$birds.slug',
           },
         },
       },
@@ -135,6 +136,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
           taxonomy: '$birds.taxonomy',
           taxonomyName: '$birds.taxonomyName',
           location: '$birds.location',
+          slug: '$birds.slug',
         },
       },
       {
@@ -218,6 +220,7 @@ export async function createListItem(param: IParam): Promise<boolean> {
     if (!taxonomyId) {
       return false
     }
+
     const isAdd = await lists.updateOne(
       { username, listName },
       {
@@ -238,6 +241,7 @@ export async function createListItem(param: IParam): Promise<boolean> {
     return false
   }
 }
+
 export async function removeListItem(param: IParam): Promise<boolean> {
   const { username, listName, taxonomyId } = param
   try {

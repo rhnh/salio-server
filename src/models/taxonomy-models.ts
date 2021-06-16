@@ -1,6 +1,7 @@
 import { IList, ISalioResponse, ITaxonomy } from '../types'
 
 import { Collection } from 'mongodb'
+import slugify from 'slugify'
 
 let taxonomies: Collection
 
@@ -122,11 +123,13 @@ export async function addSpecies(
   location: string
 ): Promise<string> {
   try {
+    const slug = slugify(taxonomyName)
     const isTaxonomy = await taxonomies.insertOne({
       taxonomy,
       taxonomyName,
       category: 'species',
       location,
+      slug,
     })
     return isTaxonomy.insertedId
   } catch (error) {
@@ -145,6 +148,23 @@ export async function getTaxonomies(): Promise<ITaxonomy[]> {
         taxonomy: 1,
       })
 
+    return isTaxonomy.toArray()
+  } catch (error) {
+    console.log('error', getTaxonomy.name)
+    return []
+  }
+}
+export async function getTaxonomySpecies(): Promise<ITaxonomy[]> {
+  try {
+    const isTaxonomy = await taxonomies
+      .find({
+        approved: true,
+        taxonomyName: { $ne: null },
+      })
+      .project({
+        taxonomyName: 1,
+        taxonomy: 1,
+      })
     return isTaxonomy.toArray()
   } catch (error) {
     console.log('error', getTaxonomy.name)

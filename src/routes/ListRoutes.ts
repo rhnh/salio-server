@@ -26,6 +26,12 @@ listRouter.get('/', verifyUser, asyncFn(routes.getListCtrl))
 
 //?get specific list with items
 listRouter.get('/list/:listName', verifyUser, asyncFn(routes.getListItemsCtrl))
+//?get specific list with items
+listRouter.get(
+  '/list/:listName/:id',
+  verifyUser,
+  asyncFn(routes.getListItemByIdCtrl)
+)
 
 //?get Total list
 listRouter.get(
