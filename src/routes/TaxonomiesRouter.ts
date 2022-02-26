@@ -32,7 +32,7 @@ taxonomyRouter.post(
   asyncFn(createTaxonomyCTRL)
 )
 
-taxonomyRouter.get('/', verifyUser, getTaxonomiesCtr)
+taxonomyRouter.get('/', getTaxonomiesCtr)
 taxonomyRouter.get('/species', verifyUser, getTaxonomySpeciesCtr)
 
 taxonomyRouter.get('/taxonomy/:taxonomyId', verifyUser)

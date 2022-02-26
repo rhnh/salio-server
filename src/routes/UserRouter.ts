@@ -1,19 +1,19 @@
 import { Router } from 'express'
 import { asyncFn } from '../utils/helpers'
 import { changePassword, registerUser } from './Users'
-import { body } from 'express-validator'
+// import { body } from 'express-validator'
 import passport from 'passport'
 import { httpStatus, IUser } from '../types'
 import { createAccountLimiter } from '../utils/basic-manager'
-import { generateToken, verifyUser } from '../utils/user-manager'
+import { generateToken, verifyToken, verifyUser } from '../utils/user-manager'
 
 export const userRouter = Router()
 //signup
 userRouter.post(
   '/',
+  // body('username').not().isEmpty().trim().isLength({ min: 3 }),
+  // body('password').not().isEmpty().trim().isLength({ min: 3 }),
   createAccountLimiter,
-  body('username').not().isEmpty().trim().isLength({ min: 3 }),
-  body('password').not().isEmpty().trim().isLength({ min: 3 }),
   asyncFn(registerUser)
 )
 //login
@@ -21,7 +21,9 @@ userRouter.post('/user', passport.authenticate('local'), (req, res) => {
   if (req.user) {
     const token = generateToken(req.user as IUser)
     res.status(httpStatus.ok)
-    return res.json(token)
+    const user = req.user as IUser
+    const { username } = user
+    return res.json({ ...token, username })
   } else {
     return res.sendStatus(httpStatus.badRequest).json({
       failed: true,
@@ -30,6 +32,7 @@ userRouter.post('/user', passport.authenticate('local'), (req, res) => {
   }
 })
 
+//logout
 userRouter.get('/user', (req, res) => {
   req.logOut()
   return res.json({
@@ -38,4 +41,19 @@ userRouter.get('/user', (req, res) => {
   })
 })
 
+//change password
 userRouter.post('/user/password', verifyUser, asyncFn(changePassword))
+
+userRouter.post('/token', (req, res) => {
+  const { authorization } = req.headers
+
+  const bearer = authorization?.split(/\s/)[1]
+  const result = verifyToken(bearer || '')
+  if (result) {
+    res.status(200)
+    return res.json({ isValidToken: true })
+  } else {
+    res.status(401)
+    return res.json({ isValidToken: false })
+  }
+})

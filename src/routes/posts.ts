@@ -1,0 +1,89 @@
+// import { validationResult } from 'express-validator'
+
+import { Response, Request } from 'express'
+// import { findUserByUsername } from '../models/user-models'
+import { IPost } from '../types'
+import {
+  createPost,
+  getFeaturedPost,
+  getPostById,
+  getPosts,
+} from '../models/post-models'
+
+export async function createPostCTRL(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  // const { username } = req.user as IUser
+  try {
+    // const user = await findUserByUsername(username)
+    const uname = 'john'
+
+    const { title, body, image_url } = req.body
+    // const errors = validationResult(req)
+    // if (!errors.isEmpty()) {
+    //   return res.status(400).json({
+    //     errors: errors.array(),
+    //     message: 'You need to fill all fields',
+    //   })
+    // }
+    console.log(title, body, image_url, 'here are the post')
+    if (uname) {
+      const post: IPost = {
+        username: uname,
+        title,
+        image_url,
+        body,
+        featured: false,
+      }
+      const result = await createPost(post)
+      if (result.done) {
+        return res.status(200).json({
+          message: `Great! You have successfully posted ${title}.`,
+        })
+      } else {
+        return res.status(400)
+      }
+    }
+    return res.status(409).json({
+      message: 'Invalid username',
+    })
+  } catch (error) {
+    throw new Error('Cannot create new Post')
+  }
+}
+
+export async function getPostsCtrl(
+  _: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const posts = await getPosts()
+    return res.json(posts)
+  } catch (error) {
+    throw new Error('Cannot get posts. Something went wrong on server')
+  }
+}
+export async function getPostByIdCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { id } = req.body
+    const post = await getPostById(id)
+    return res.json(post)
+  } catch (error) {
+    throw new Error('Cannot get posts. Something went wrong on server')
+  }
+}
+export async function getFeaturedPostCtrl(
+  _: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const post = await getFeaturedPost()
+    return res.json(post)
+  } catch (error) {
+    throw new Error('Cannot get posts. Something went wrong on server')
+  }
+}

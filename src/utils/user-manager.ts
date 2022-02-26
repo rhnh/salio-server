@@ -100,3 +100,22 @@ export function generateToken(user: IUser): { token: string; expires: string } {
     expires: expiresIn,
   }
 }
+export function verifyToken(token: string): boolean {
+  let results = false
+  jsonwebtoken.verify(
+    token,
+    PUBLIC_KEY,
+    { algorithms: ['RS256'] },
+    (err, res) => {
+      if (err) {
+        return (results = false)
+      }
+      if (res) {
+        return (results = true)
+      }
+      return false
+    }
+  )
+
+  return results
+}

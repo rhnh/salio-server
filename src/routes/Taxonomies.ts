@@ -6,6 +6,7 @@ import {
   getTaxonomySpecies,
   updateTaxonomy,
 } from '../models/taxonomy-models'
+
 import { httpStatus, ITaxonomy, IUser } from '../types'
 /**
  *
@@ -104,17 +105,17 @@ export async function updateTaxonomyCTRL(
   }
 }
 export async function getTaxonomiesCtr(
-  req: Request,
+  _: Request,
   res: Response
 ): Promise<Response> {
   try {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() })
-    }
+    // const errors = validationResult(req)
+    // if (!errors.isEmpty()) {
+    //   return res.status(400).json({ errors: errors.array() })
+    // }
 
     const isTaxonomies = await getTaxonomies()
-
+    console.log('here are your tax', isTaxonomies)
     if (isTaxonomies.length > 0) {
       return res.status(httpStatus.ok).json(isTaxonomies)
     }

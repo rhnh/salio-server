@@ -98,7 +98,12 @@ export async function getListCtrl(
       .status(httpStatus.badRequest)
       .json({ message: 'no list found', done: false })
   } catch (error) {
-    return error
+    const err = error as Error
+    return res.status(500).json({
+      done: false,
+      error: true,
+      message: err.message,
+    })
   }
 }
 
@@ -121,7 +126,12 @@ export async function getListByNameCtrl(
       .status(httpStatus.badRequest)
       .json({ message: 'no list found', done: false })
   } catch (error) {
-    return error
+    const err = error as Error
+    return res.status(500).json({
+      done: false,
+      error: true,
+      message: err.message,
+    })
   }
 }
 //Add specific Specific Taxonomy to user list
@@ -180,10 +190,11 @@ export async function addListItemCtrl(
       })
     }
   } catch (error) {
-    return res.json({
+    const err = error as Error
+    return res.status(500).json({
       done: false,
       error: true,
-      message: error.message,
+      message: err.message,
     })
   }
 }
@@ -205,10 +216,11 @@ export async function getListItemsCtrl(
 
     return res.json(result)
   } catch (error) {
-    return res.json({
+    const err = error as Error
+    return res.status(500).json({
       done: false,
       error: true,
-      message: error.message,
+      message: err.message,
     })
   }
 }
@@ -232,10 +244,11 @@ export async function getListItemByIdCtrl(
     })
     return res.json(bird)
   } catch (error) {
-    return res.json({
+    const err = error as Error
+    return res.status(500).json({
       done: false,
       error: true,
-      message: error.message,
+      message: err.message,
     })
   }
 }
@@ -251,10 +264,11 @@ export async function getTotalItemsCtrl(
     const total = await ListModel.getTotalItems({ listName, username })
     return res.json({ total })
   } catch (error) {
-    return res.json({
+    const err = error as Error
+    return res.status(500).json({
       done: false,
       error: true,
-      message: error.message,
+      message: err.message,
     })
   }
 }
@@ -274,10 +288,11 @@ export async function removeItemsCtrl(
     })
     return res.json({ done, message: 'successfully delete it' })
   } catch (error) {
-    return res.json({
+    const err = error as Error
+    return res.status(500).json({
       done: false,
       error: true,
-      message: error.message,
+      message: err.message,
     })
   }
 }

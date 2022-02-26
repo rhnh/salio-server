@@ -20,5 +20,5 @@
     "readme.md": true,
     "package-lock.json": true
   },
-  "workbench.colorTheme": "Ysgrifennwr"
+  "workbench.colorTheme": "Gruvbox Material Dark"
 }

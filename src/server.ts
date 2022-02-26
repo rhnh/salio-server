@@ -3,6 +3,7 @@ import { DB_NAME, URI, DB_PORT } from './utils/configs'
 import { setList, /*setListItem, setTaxonomies,*/ setUser } from './models'
 import { Application } from 'express'
 import { setItems } from './models/taxonomy-models'
+import { setPosts } from './models/post-models'
 
 const client = new MongoClient(URI, { useUnifiedTopology: true })
 export async function server(app: Application): Promise<void> {
@@ -26,6 +27,7 @@ export async function server(app: Application): Promise<void> {
     }
     try {
       setUser(client.db(DB_NAME).collection('users'))
+      setPosts(client.db(DB_NAME).collection('posts'))
       setList(client.db(DB_NAME).collection('lists'))
       // setListItem(client.db(DB_NAME).collection("lists"));
       setItems(client.db(DB_NAME).collection('taxonomies'))
@@ -36,9 +38,9 @@ export async function server(app: Application): Promise<void> {
       console.error('cannot set the collection')
       process.exit(1)
     }
-  } catch (error) { 
-    console.log(URI,DB_NAME)
-    console.log(error);
+  } catch (error) {
+    console.log(URI, DB_NAME)
+    console.log(error)
     console.error('cannot connect the database! ')
     process.exit(1)
   }

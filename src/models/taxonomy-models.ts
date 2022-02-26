@@ -34,7 +34,7 @@ export async function createTaxonomy(
     console.log(error)
     return {
       done: false,
-      error: new Error(error),
+      error: new Error('Error'),
     }
   }
 }
@@ -68,7 +68,7 @@ export async function updateTaxonomy(
     console.log(error)
     return {
       done: false,
-      error: new Error(error),
+      error: new Error('Error while updating Taxonomy'),
     }
   }
 }
@@ -139,14 +139,13 @@ export async function addSpecies(
 }
 export async function getTaxonomies(): Promise<ITaxonomy[]> {
   try {
-    const isTaxonomy = await taxonomies
-      .find({
-        approved: true,
-      })
-      .project({
-        taxonomyName: 1,
-        taxonomy: 1,
-      })
+    const isTaxonomy = await taxonomies.find({
+      approved: true,
+    })
+    // .project({
+    //   taxonomyName: 1,
+    //   taxonomy: 1,
+    // })
 
     return isTaxonomy.toArray()
   } catch (error) {
