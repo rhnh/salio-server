@@ -3,10 +3,10 @@
  *
  * Make sure to save the private key elsewhere after generated!
  */
-import  crypto from  'crypto';
-import fs  from 'fs';
+import crypto from 'crypto'
+import fs from 'fs'
 
-export function genKeyPair() {
+export function genKeyPair(): void {
   // Generates an object where the keys are stored in properties `privateKey` and `publicKey`
   const keyPair = crypto.generateKeyPairSync('rsa', {
     modulusLength: 4096, // bits - standard for RSA keys
@@ -20,11 +20,8 @@ export function genKeyPair() {
     },
   })
 
-
   fs.writeFileSync(__dirname + '/id_rsa_pub.pem', keyPair.publicKey)
 
   // Create the private key file
   fs.writeFileSync(__dirname + '/id_rsa_priv.pem', keyPair.privateKey)
 }
-
-

@@ -44,7 +44,8 @@ userRouter.get('/user', (req, res) => {
 //change password
 userRouter.post('/user/password', verifyUser, asyncFn(changePassword))
 
-userRouter.post('/token', (req, res) => {
+//verifyUser
+userRouter.post('/verify-user', (req, res) => {
   const { authorization } = req.headers
 
   const bearer = authorization?.split(/\s/)[1]

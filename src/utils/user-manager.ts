@@ -82,7 +82,6 @@ export const verifyUser = passport.authenticate('jwt', {
 
 export function generateToken(user: IUser): { token: string; expires: string } {
   const _id = user._id
-
   const expiresIn = '1d'
 
   const payload = {
@@ -94,28 +93,28 @@ export function generateToken(user: IUser): { token: string; expires: string } {
     expiresIn: expiresIn,
     algorithm: 'RS256',
   })
-
   return {
     token: signedToken,
     expires: expiresIn,
   }
 }
 export function verifyToken(token: string): boolean {
-  let results = false
+  let result = false
   jsonwebtoken.verify(
     token,
     PUBLIC_KEY,
     { algorithms: ['RS256'] },
     (err, res) => {
       if (err) {
-        return (results = false)
+        result = false
       }
       if (res) {
-        return (results = true)
+        result = true
+      } else {
+        result = false
       }
-      return false
     }
   )
 
-  return results
+  return result
 }
