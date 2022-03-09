@@ -42,7 +42,7 @@ export async function registerUser(
           message: 'Something went wrong on server',
         })
   } catch (error) {
-    // console.log(error)
+    console.error(error)
     res.json({ statusMessage: 'something went wrong', statusCode: 505 })
   }
 }

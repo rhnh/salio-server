@@ -107,7 +107,7 @@ export async function getPosts(): Promise<IPost[]> {
     const posts = await postsCollection.find({})
     return posts.toArray()
   } catch (error) {
-    console.log('error', getPosts.name)
+    console.error('error', getPosts.name)
     throw new Error('Cannot find any post. Server error. Please try later')
   }
 }

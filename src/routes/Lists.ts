@@ -12,7 +12,8 @@ export async function createListCtrl(
   try {
     const { listName } = req.body
     const { username } = req.user as IUser
-    const alreadyList = await ListModel.getList({
+
+    const alreadyList = await ListModel.getListByName({
       listName,
       username,
     })
@@ -115,9 +116,36 @@ export async function getListByNameCtrl(
   const { username } = req.user as IUser
   const { listName } = req.params
   try {
-    const list = await ListModel.getList({
+    const list = await ListModel.getListByName({
       username,
       listName,
+    })
+    if (list) {
+      return res.status(200).json(list)
+    }
+    return res
+      .status(httpStatus.badRequest)
+      .json({ message: 'no list found', done: false })
+  } catch (error) {
+    const err = error as Error
+    return res.status(500).json({
+      done: false,
+      error: true,
+      message: err.message,
+    })
+  }
+}
+//get user's specific list
+export async function getListByIDCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+  const { listId } = req.params
+  try {
+    const list = await ListModel.getListByID({
+      username,
+      _id: listId,
     })
     if (list) {
       return res.status(200).json(list)
@@ -140,16 +168,16 @@ export async function addListItemCtrl(
   res: Response
 ): Promise<Response> {
   const { username } = req.user as IUser
-  const { taxonomyName, taxonomy, location } = req.body
+  const { englishName, taxonomy, location } = req.body
   const { listName } = req.params
-  if (taxonomyName === '' || taxonomy === '') {
+  if (englishName === '' || taxonomy === '') {
     res.status(409)
     return res.json({
       message: httpStatus.badRequest,
     })
   }
   try {
-    const isTaxonomy = await getTaxonomy(taxonomyName, taxonomy)
+    const isTaxonomy = await getTaxonomy(englishName, taxonomy)
 
     const { _id } = ((await isTaxonomy) as ITaxonomy) || ''
     if (_id) {
@@ -165,13 +193,13 @@ export async function addListItemCtrl(
           message: 'successfully added',
         })
       } else {
-        return res.json({
+        return res.status(404).json({
           done: false,
           message: 'Something went wrong',
         })
       }
     }
-    const taxonomyId = await addSpecies(taxonomyName, taxonomy, location)
+    const taxonomyId = await addSpecies(englishName, taxonomy, location)
     const done = await ListModel.createListItem({
       username,
       listName,
@@ -204,7 +232,6 @@ export async function getListItemsCtrl(
   res: Response
 ): Promise<Response> {
   const { username } = req.user as IUser
-
   const { listName } = req.params
   try {
     const birds = await ListModel.getListItems({

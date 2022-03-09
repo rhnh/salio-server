@@ -39,8 +39,7 @@ export async function server(app: Application): Promise<void> {
       process.exit(1)
     }
   } catch (error) {
-    console.log(URI, DB_NAME)
-    console.log(error)
+    console.error(error)
     console.error('cannot connect the database! ')
     process.exit(1)
   }

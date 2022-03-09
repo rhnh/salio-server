@@ -8,8 +8,6 @@ export const createAccountLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   handler: (__, response, _, options) => {
-    console.log(options.message)
-
     return response
       .status(options.statusCode)
       .send({ message: options.message })

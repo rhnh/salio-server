@@ -27,7 +27,7 @@ export async function createPostCTRL(
     //     message: 'You need to fill all fields',
     //   })
     // }
-    console.log(title, body, image_url, 'here are the post')
+
     if (uname) {
       const post: IPost = {
         username: uname,

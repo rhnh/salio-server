@@ -28,7 +28,7 @@ const errorHandler: ErrorRequestHandler = (
   if (req.xhr) {
     res.status(500).send({ error: 'Something failed!' })
   } else {
-    console.log(err, 'Error')
+    console.error(err, 'Error')
     next(err)
   }
 }

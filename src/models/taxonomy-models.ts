@@ -31,7 +31,7 @@ export async function createTaxonomy(
       message: 'Something went wrong',
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return {
       done: false,
       error: new Error('Error'),
@@ -65,7 +65,7 @@ export async function updateTaxonomy(
       message: 'Something went wrong in database',
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return {
       done: false,
       error: new Error('Error while updating Taxonomy'),
@@ -96,44 +96,44 @@ export async function getSpeciesByIds({
     ])
     return await birds.toArray()
   } catch (error) {
-    console.log('something went wrong', getSpeciesByIds.name, error)
+    console.error('something went wrong', getSpeciesByIds.name, error)
     return []
   }
 }
 
 export async function getTaxonomy(
-  taxonomyName: string,
+  englishName: string,
   taxonomy: string
 ): Promise<ITaxonomy | null> {
   try {
     const isTaxonomy = await taxonomies.findOne({
-      taxonomyName,
+      englishName,
       taxonomy,
     })
     return isTaxonomy
   } catch (error) {
-    console.log('error', getTaxonomy.name)
+    console.error('error', getTaxonomy.name)
     return null
   }
 }
 
 export async function addSpecies(
-  taxonomyName: string,
+  englishName: string,
   taxonomy: string,
   location: string
 ): Promise<string> {
   try {
-    const slug = slugify(taxonomyName)
+    const slug = slugify(englishName)
     const isTaxonomy = await taxonomies.insertOne({
       taxonomy,
-      taxonomyName,
+      englishName,
       category: 'species',
       location,
       slug,
     })
     return isTaxonomy.insertedId
   } catch (error) {
-    console.log('error', getTaxonomy.name)
+    console.error('error', getTaxonomy.name)
     return ''
   }
 }
@@ -143,13 +143,13 @@ export async function getTaxonomies(): Promise<ITaxonomy[]> {
       approved: true,
     })
     // .project({
-    //   taxonomyName: 1,
+    //   englishName: 1,
     //   taxonomy: 1,
     // })
 
     return isTaxonomy.toArray()
   } catch (error) {
-    console.log('error', getTaxonomy.name)
+    console.error('error', getTaxonomy.name)
     return []
   }
 }
@@ -158,15 +158,15 @@ export async function getTaxonomySpecies(): Promise<ITaxonomy[]> {
     const isTaxonomy = await taxonomies
       .find({
         approved: true,
-        taxonomyName: { $ne: null },
+        englishName: { $ne: null },
       })
       .project({
-        taxonomyName: 1,
+        englishName: 1,
         taxonomy: 1,
       })
     return isTaxonomy.toArray()
   } catch (error) {
-    console.log('error', getTaxonomy.name)
+    console.error('error', getTaxonomy.name)
     return []
   }
 }

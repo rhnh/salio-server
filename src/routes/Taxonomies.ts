@@ -21,7 +21,7 @@ export async function createTaxonomyCTRL(
 ): Promise<Response> {
   try {
     const {
-      taxonomyName,
+      englishName,
       category,
       parent,
       ancestors,
@@ -34,7 +34,7 @@ export async function createTaxonomyCTRL(
     }
     const { username } = req.user as IUser
     const item: ITaxonomy = {
-      taxonomyName,
+      englishName,
       category,
       sex,
       username,
@@ -64,11 +64,11 @@ export async function updateTaxonomyCTRL(
 ): Promise<Response> {
   try {
     const {
-      taxonomyName,
+      englishName,
       category,
       taxonomy,
       uTaxonomy,
-      uTaxonomyName,
+      englishName_new,
       uCategory,
     } = req.body
     const errors = validationResult(req)
@@ -77,7 +77,7 @@ export async function updateTaxonomyCTRL(
     }
     const { username } = req.user as IUser
     const t1: ITaxonomy = {
-      taxonomyName,
+      englishName,
       category,
       username,
       taxonomy,
@@ -85,7 +85,7 @@ export async function updateTaxonomyCTRL(
     }
 
     const ut1: ITaxonomy = {
-      taxonomyName: uTaxonomyName,
+      englishName: englishName_new,
       category: uCategory,
       approved: false,
       username,
@@ -115,7 +115,7 @@ export async function getTaxonomiesCtr(
     // }
 
     const isTaxonomies = await getTaxonomies()
-    console.log('here are your tax', isTaxonomies)
+
     if (isTaxonomies.length > 0) {
       return res.status(httpStatus.ok).json(isTaxonomies)
     }

@@ -1,4 +1,5 @@
 import { Cursor, Collection, ObjectID } from 'mongodb'
+import slugify from 'slugify'
 import { IList } from '../types'
 let lists: Collection
 
@@ -11,6 +12,7 @@ export async function create({ username, listName }: IList): Promise<boolean> {
     const newList = await lists.insertOne({
       username,
       listName,
+      slug: slugify(listName),
       createAt: Date.now(),
     })
     return newList.result.n === 1
@@ -19,7 +21,7 @@ export async function create({ username, listName }: IList): Promise<boolean> {
   }
 }
 
-export async function getList({
+export async function getListByName({
   username,
   listName,
 }: IList): Promise<IList | null> {
@@ -30,6 +32,22 @@ export async function getList({
     return null
   }
 }
+
+export async function getListByID({
+  username,
+  _id,
+}: {
+  username: string
+  _id: string
+}): Promise<IList | null> {
+  try {
+    const hasList = await lists.findOne({ username, _id })
+    return hasList
+  } catch (error) {
+    return null
+  }
+}
+
 export async function getTotalItems({
   listName,
   username,
@@ -88,7 +106,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
                   seen: '$birdIds.seen',
                   taxonomy: '$birds.taxonomy',
                   location: '$birds.location',
-                  taxonomyName: '$birds.taxonomyName',
+                  englishName: '$birds.englishName',
                   slug: '$birds.slug',
                 },
                 null,
@@ -117,7 +135,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
             listName: '$birds.listName',
             seen: '$birds.seen',
             taxonomy: '$birds.taxonomy',
-            taxonomyName: '$birds.taxonomyName',
+            englishName: '$birds.englishName',
             location: '$birds.location',
             slug: '$birds.slug',
           },
@@ -134,21 +152,21 @@ export async function getListItems(param: IList): Promise<Cursor> {
           _id: '$birds.id',
           seen: '$birds.seen',
           taxonomy: '$birds.taxonomy',
-          taxonomyName: '$birds.taxonomyName',
+          englishName: '$birds.englishName',
           location: '$birds.location',
           slug: '$birds.slug',
         },
       },
       {
         $sort: {
-          taxonomyName: 1,
+          englishName: 1,
         },
       },
     ])
 
     return listItems
   } catch (error) {
-    return error
+    throw new Error(getListItems.name + ' has error')
   }
 }
 
@@ -205,11 +223,11 @@ export async function getListsByUsername({
       .toArray()
     return allLists
   } catch (error) {
-    return error
+    throw new Error(getListsByUsername.name + ' has error')
   }
 }
 interface IParam {
-  taxonomyId?: string
+  taxonomyId: string
   listName: string
   username: string
   location?: string

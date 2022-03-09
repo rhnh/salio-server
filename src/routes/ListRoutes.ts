@@ -5,6 +5,10 @@ import { verifyUser } from '../utils/user-manager'
 import { asyncFn } from '../utils/helpers'
 
 export const listRouter = Router()
+
+/**
+ * DELETE
+ */
 //!Delete by Id
 listRouter.delete(
   '/list/:listName/bird/:taxonomyId',
@@ -21,38 +25,26 @@ listRouter.delete(
   verifyUser,
   asyncFn(routes.deleteListCtrl)
 )
-//?get all list- no pagination is need, because can have only 10 to 20 lists in total
-listRouter.get('/', verifyUser, asyncFn(routes.getListCtrl))
 
-//?get specific list with items
-listRouter.get('/list/:listName', verifyUser, asyncFn(routes.getListItemsCtrl))
-//?get specific list with items
-listRouter.get(
-  '/list/:listName/:id',
-  verifyUser,
-  asyncFn(routes.getListItemByIdCtrl)
-)
-
-//?get Total list
-listRouter.get(
-  '/list/total-items/:listName',
-  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
-
-  verifyUser,
-  asyncFn(routes.getTotalItemsCtrl)
-)
+/**
+ * POST
+ */
 // * Create new list
 listRouter.post(
-  '/',
-  body('listName').not().isEmpty().trim().isLength({ min: 3 }),
+  '/:listName',
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
   asyncFn(routes.createListCtrl)
 )
+
+//POST all list- no pagination is need, because can have only 10 to 20 lists in total
+listRouter.post('/', verifyUser, asyncFn(routes.getListCtrl))
+
 // *Add new Taxonomy to the list
 listRouter.post(
   '/list/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
-  body('taxonomyName').not().isEmpty().trim().isLength({
+  body('englishName').not().isEmpty().trim().isLength({
     min: 3,
   }),
   body('taxonomy').not().isEmpty().trim().isLength({
@@ -60,4 +52,33 @@ listRouter.post(
   }),
   verifyUser,
   asyncFn(routes.addListItemCtrl)
+)
+
+/**
+ * GET
+ */
+//Send specific list with items
+listRouter.get('/list/:listName', verifyUser, asyncFn(routes.getListItemsCtrl))
+
+//?get specific list with items
+listRouter.get(
+  '/list/:listName/:id',
+  verifyUser,
+  asyncFn(routes.getListItemByIdCtrl)
+)
+
+//get Total list
+listRouter.get(
+  '/list/total-items/:listName',
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
+  verifyUser,
+  asyncFn(routes.getTotalItemsCtrl)
+)
+
+//get list by ID
+listRouter.get(
+  '/list/:listId',
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
+  verifyUser,
+  asyncFn(routes.getTotalItemsCtrl)
 )

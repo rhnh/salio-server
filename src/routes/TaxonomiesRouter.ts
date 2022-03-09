@@ -13,7 +13,7 @@ export const taxonomyRouter = Router()
 /**
  *  
  *  
-  taxonomyName: string
+  englishName: string
   category: ICategories
   parent?: string
   approved: boolean
