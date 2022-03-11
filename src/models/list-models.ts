@@ -69,7 +69,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
     const listItems = lists?.aggregate([
       {
         $match: {
-          listName,
+          slug: listName,
           username,
         },
       },
@@ -217,6 +217,7 @@ export async function getListsByUsername({
             listName: 1,
             createAt: 1,
             location: 1,
+            slug: 1,
           },
         }
       )
@@ -240,7 +241,7 @@ export async function createListItem(param: IParam): Promise<boolean> {
     }
 
     const isAdd = await lists.updateOne(
-      { username, listName },
+      { username, slug: listName },
       {
         $push: {
           birdIds: {

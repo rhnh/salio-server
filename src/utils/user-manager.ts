@@ -98,23 +98,33 @@ export function generateToken(user: IUser): { token: string; expires: string } {
     expires: expiresIn,
   }
 }
-export function verifyToken(token: string): boolean {
-  let result = false
-  jsonwebtoken.verify(
-    token,
-    PUBLIC_KEY,
-    { algorithms: ['RS256'] },
-    (err, res) => {
-      if (err) {
-        result = false
-      }
-      if (res) {
-        result = true
-      } else {
-        result = false
-      }
-    }
-  )
 
-  return result
+interface IVerifiedUser {
+  role: string
+  username: string
+  isValidToken: boolean
+  token: string
+}
+
+export async function verifyToken(
+  token: string
+): Promise<IVerifiedUser | null> {
+  const { sub } = jsonwebtoken.verify(token, PUBLIC_KEY, {
+    algorithms: ['RS256'],
+  }) as { sub: string }
+  if (sub) {
+    try {
+      const res = await findUserById(sub)
+      return {
+        username: res?.username || '',
+        role: res?.role || '',
+        token,
+        isValidToken: true,
+      }
+    } catch (error) {
+      return null
+    }
+  } else {
+    return null
+  }
 }

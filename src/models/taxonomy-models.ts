@@ -1,7 +1,8 @@
 import { IList, ISalioResponse, ITaxonomy } from '../types'
 
-import { Collection } from 'mongodb'
+import { Collection, ObjectID } from 'mongodb'
 import slugify from 'slugify'
+import { log } from 'console'
 
 let taxonomies: Collection
 
@@ -73,7 +74,7 @@ export async function updateTaxonomy(
   }
 }
 
-export async function getSpeciesByIds({
+export async function getUserTaxonomy({
   username,
   listName,
 }: IList): Promise<ITaxonomy[] | []> {
@@ -96,7 +97,7 @@ export async function getSpeciesByIds({
     ])
     return await birds.toArray()
   } catch (error) {
-    console.error('something went wrong', getSpeciesByIds.name, error)
+    console.error('something went wrong', getUserTaxonomy.name, error)
     return []
   }
 }
@@ -168,5 +169,19 @@ export async function getTaxonomySpecies(): Promise<ITaxonomy[]> {
   } catch (error) {
     console.error('error', getTaxonomy.name)
     return []
+  }
+}
+export async function getTaxonomyById(_id: string): Promise<ITaxonomy | null> {
+  try {
+    const isTaxonomy = await taxonomies.findOne({
+      // approved: true,
+      _id: new ObjectID(_id),
+    })
+
+    log(isTaxonomy)
+    return (isTaxonomy as unknown) as ITaxonomy
+  } catch (error) {
+    console.error('error', getTaxonomy.name)
+    return null
   }
 }

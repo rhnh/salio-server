@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator'
 import {
   createTaxonomy,
   getTaxonomies,
+  getTaxonomyById,
   getTaxonomySpecies,
   updateTaxonomy,
 } from '../models/taxonomy-models'
@@ -138,6 +139,27 @@ export async function getTaxonomySpeciesCtr(
 
     if (isTaxonomies.length > 0) {
       return res.status(httpStatus.ok).json(isTaxonomies)
+    }
+    return res.status(httpStatus.badRequest).json({ done: false })
+  } catch (error) {
+    return res.json(error)
+  }
+}
+export async function getTaxonomyByIdCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
+    const { taxonomyId } = req.params
+
+    const taxonomy = await getTaxonomyById(taxonomyId)
+    if (taxonomy) {
+      return res.status(200).send(taxonomy)
     }
     return res.status(httpStatus.badRequest).json({ done: false })
   } catch (error) {

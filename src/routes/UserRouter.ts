@@ -45,16 +45,20 @@ userRouter.get('/user', (req, res) => {
 userRouter.post('/user/password', verifyUser, asyncFn(changePassword))
 
 //verifyUser
-userRouter.post('/verify-user', (req, res) => {
-  const { authorization } = req.headers
+userRouter.post(
+  '/verify-user',
+  verifyUser,
+  asyncFn(async (req, res) => {
+    const { authorization } = req.headers
 
-  const bearer = authorization?.split(/\s/)[1]
-  const result = verifyToken(bearer || '')
-  if (result) {
-    res.status(200)
-    return res.json({ isValidToken: true })
-  } else {
-    res.status(401)
-    return res.json({ isValidToken: false })
-  }
-})
+    const bearer = authorization?.split(/\s/)[1]
+    const result = await verifyToken(bearer || '')
+    if (result && result?.isValidToken) {
+      res.status(200)
+      return res.json({ ...result })
+    } else {
+      res.status(401)
+      return res.json({ isValidToken: false })
+    }
+  })
+)

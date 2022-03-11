@@ -6,6 +6,7 @@ import { verifyUser } from '../utils/user-manager'
 import {
   createTaxonomyCTRL,
   getTaxonomiesCtr,
+  getTaxonomyByIdCtrl,
   getTaxonomySpeciesCtr,
 } from './Taxonomies'
 
@@ -35,4 +36,8 @@ taxonomyRouter.post(
 taxonomyRouter.get('/', getTaxonomiesCtr)
 taxonomyRouter.get('/species', verifyUser, getTaxonomySpeciesCtr)
 
-taxonomyRouter.get('/taxonomy/:taxonomyId', verifyUser)
+taxonomyRouter.get(
+  '/taxonomy/:taxonomyId',
+  verifyUser,
+  asyncFn(getTaxonomyByIdCtrl)
+)
