@@ -4,6 +4,7 @@ import {
   addUser,
   changeUserPassword,
   findUserByUsername,
+  getUserProfile,
 } from '../models/user-models'
 import { httpStatus } from '../types'
 import { generatePassword } from '../utils/password'
@@ -61,6 +62,20 @@ export async function changePassword(
     return res.json({ done: hasChanged })
   } catch (error) {
     console.warn('error', changePassword.name)
+    return res.json({ done: false, error: true })
+  }
+}
+export async function getUserProfileCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { username } = req.params
+    const user = await getUserProfile(username)
+
+    return res.json({ ...user })
+  } catch (error) {
+    console.warn('error', getUserProfileCtrl.name)
     return res.json({ done: false, error: true })
   }
 }

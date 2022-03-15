@@ -18,7 +18,9 @@
     "**/node_modules/**": true,
     "yarn.lock": true,
     "readme.md": true,
-    "package-lock.json": true
+    "package-lock.json": true,
+    ".gitignore": true,
+    "package.json": true
   },
   "workbench.colorTheme": "Prism"
 }

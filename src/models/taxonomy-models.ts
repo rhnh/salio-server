@@ -2,7 +2,6 @@ import { IList, ISalioResponse, ITaxonomy } from '../types'
 
 import { Collection, ObjectID } from 'mongodb'
 import slugify from 'slugify'
-import { log } from 'console'
 
 let taxonomies: Collection
 
@@ -178,7 +177,6 @@ export async function getTaxonomyById(_id: string): Promise<ITaxonomy | null> {
       _id: new ObjectID(_id),
     })
 
-    log(isTaxonomy)
     return (isTaxonomy as unknown) as ITaxonomy
   } catch (error) {
     console.error('error', getTaxonomy.name)

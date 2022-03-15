@@ -33,6 +33,33 @@ export async function findUserByUsername(
     return null
   }
 }
+export async function getUserProfile(username: string): Promise<IUser | null> {
+  try {
+    const user = await users
+      .aggregate([
+        { $match: { username } },
+        {
+          $lookup: {
+            from: 'lists',
+            localField: 'username',
+            foreignField: 'username',
+            as: 'listItems',
+          },
+        },
+        { $project: { password: 0, 'lists.birdIds': 0, 'lists.username': 0 } },
+        { $addFields: { totalLists: { $size: '$listItems' } } },
+        { $project: { listItems: 0 } },
+      ])
+      .toArray()
+    if (user.length === 1) {
+      return user[0] as IUser
+    } else {
+      return null
+    }
+  } catch (error) {
+    return null
+  }
+}
 export async function findUser(user: IUser): Promise<IUser | null> {
   try {
     const { username, password } = user

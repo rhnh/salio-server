@@ -26,7 +26,21 @@ export async function getListByName({
   listName,
 }: IList): Promise<IList | null> {
   try {
-    const hasList = await lists.findOne({ username, listName })
+    const hasList = await lists.findOne({
+      username,
+      slug: listName.toLowerCase(),
+    })
+    return hasList
+  } catch (error) {
+    return null
+  }
+}
+export async function getListBySlug({
+  username,
+  listName,
+}: IList): Promise<IList | null> {
+  try {
+    const hasList = await lists.findOne({ username, slug: listName })
     return hasList
   } catch (error) {
     return null
@@ -194,7 +208,7 @@ export async function deleteUserListName({
   username,
 }: IList): Promise<boolean> {
   try {
-    const hasDeletedList = await lists.deleteOne({ username, listName })
+    const hasDeletedList = await lists.deleteOne({ username, slug: listName })
     return hasDeletedList.result.n === 1
   } catch (error) {
     return false

@@ -1,11 +1,12 @@
 import { Router } from 'express'
 import { asyncFn } from '../utils/helpers'
-import { changePassword, registerUser } from './Users'
+import { changePassword, getUserProfileCtrl, registerUser } from './Users'
 // import { body } from 'express-validator'
 import passport from 'passport'
 import { httpStatus, IUser } from '../types'
 import { createAccountLimiter } from '../utils/basic-manager'
 import { generateToken, verifyToken, verifyUser } from '../utils/user-manager'
+import { param } from 'express-validator'
 
 export const userRouter = Router()
 //signup
@@ -31,6 +32,13 @@ userRouter.post('/user', passport.authenticate('local'), (req, res) => {
     })
   }
 })
+//profile
+userRouter.post(
+  '/user/profile/:username',
+  param('username').not().isEmpty().trim().isLength({ min: 3 }),
+  verifyUser,
+  asyncFn(getUserProfileCtrl)
+)
 
 //logout
 userRouter.get('/user', (req, res) => {
