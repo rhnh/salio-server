@@ -22,5 +22,5 @@
     ".gitignore": true,
     "package.json": true
   },
-  "workbench.colorTheme": "Prism"
+  "workbench.colorTheme": "Default Light+"
 }

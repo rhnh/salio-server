@@ -3,10 +3,13 @@ import { validationResult } from 'express-validator'
 import {
   addUser,
   changeUserPassword,
+  deleteUserByUsername,
   findUserByUsername,
+  getAllUsers,
   getUserProfile,
+  setPrivilege,
 } from '../models/user-models'
-import { httpStatus } from '../types'
+import { httpStatus, IUser } from '../types'
 import { generatePassword } from '../utils/password'
 
 export async function registerUser(
@@ -65,6 +68,7 @@ export async function changePassword(
     return res.json({ done: false, error: true })
   }
 }
+
 export async function getUserProfileCtrl(
   req: Request,
   res: Response
@@ -76,6 +80,103 @@ export async function getUserProfileCtrl(
     return res.json({ ...user })
   } catch (error) {
     console.warn('error', getUserProfileCtrl.name)
+    return res.json({ done: false, error: true })
+  }
+}
+
+export async function getMembersCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const givenUser = req.user as IUser
+    const username = givenUser?.username
+    const user = await findUserByUsername(username)
+    if (user?.role !== 'admin') {
+      return res.status(401).send({ message: 'You are not authorized!' })
+    }
+    const users = await getAllUsers()
+
+    return res.json(users)
+  } catch (error) {
+    console.warn('error', getMembersCtrl.name)
+    return res.json({ done: false, error: true })
+  }
+}
+
+export async function setPrivilegeCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const givenUser = req.user as IUser
+    const admin = givenUser?.username //gets from token
+    const isAdmin = await findUserByUsername(admin)
+
+    if (isAdmin?.role !== 'admin') {
+      return res.status(401).send({ message: 'You are not authorized!' })
+    }
+
+    const { role } = req.body
+    const { username } = req.params
+    if (role === undefined || username === undefined) {
+      return res.status(404).send({
+        message: 'bad request',
+        done: false,
+      })
+    }
+
+    const isSuccess = await setPrivilege(username, role)
+    if (isSuccess) {
+      return res.status(200).send({
+        message: `You granted {username} changed to mode`,
+        done: false,
+      })
+    }
+    return res.status(400).send({
+      message: `Something went wrong`,
+      done: false,
+    })
+  } catch (error) {
+    console.warn('error', getMembersCtrl.name)
+    return res.json({ done: false, error: true })
+  }
+}
+
+export async function deleteUserCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const givenUser = req.user as IUser
+    const admin = givenUser?.username //gets from token
+    const isAdmin = await findUserByUsername(admin)
+
+    if (isAdmin?.role !== 'admin') {
+      return res.status(401).send({ message: 'You are not authorized!' })
+    }
+
+    const { username } = req.params
+    if (username === undefined || username === 'admin') {
+      return res.status(404).send({
+        message: 'bad request',
+        done: false,
+      })
+    }
+
+    const isSuccess = await deleteUserByUsername(username)
+    if (isSuccess) {
+      return res.status(200).send({
+        message: `You delete {username}`,
+        done: false,
+      })
+    }
+    return res.status(400).send({
+      message: `Something went wrong`,
+      done: false,
+    })
+  } catch (error) {
+    console.warn('error', getMembersCtrl.name)
     return res.json({ done: false, error: true })
   }
 }

@@ -1,6 +1,13 @@
 import { Router } from 'express'
 import { asyncFn } from '../utils/helpers'
-import { changePassword, getUserProfileCtrl, registerUser } from './Users'
+import {
+  changePassword,
+  getUserProfileCtrl,
+  registerUser,
+  getMembersCtrl,
+  setPrivilegeCtrl,
+  deleteUserCtrl,
+} from './Users'
 // import { body } from 'express-validator'
 import passport from 'passport'
 import { httpStatus, IUser } from '../types'
@@ -52,7 +59,15 @@ userRouter.get('/user', (req, res) => {
 //change password
 userRouter.post('/user/password', verifyUser, asyncFn(changePassword))
 
-//verifyUser
+//members
+userRouter.post('/members', verifyUser, asyncFn(getMembersCtrl))
+
+//changeRole
+userRouter.put('/members/:username', verifyUser, asyncFn(setPrivilegeCtrl))
+//delete User
+userRouter.delete('/members/:username', verifyUser, asyncFn(deleteUserCtrl))
+
+//verify user
 userRouter.post(
   '/verify-user',
   verifyUser,

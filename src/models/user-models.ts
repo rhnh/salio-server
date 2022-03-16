@@ -33,6 +33,47 @@ export async function findUserByUsername(
     return null
   }
 }
+export async function setPrivilege(
+  username: string,
+  role: string
+): Promise<boolean | null> {
+  try {
+    const isUser = await users.updateOne(
+      {
+        username,
+      },
+      {
+        $set: { role },
+      }
+    )
+
+    if (isUser.result.n === 1) {
+      return true
+    }
+    return false
+  } catch (error) {
+    return null
+  }
+}
+
+export async function getAllUsers(): Promise<IUser[] | null> {
+  try {
+    const isUser = await users
+      .find(
+        {},
+        {
+          projection: {
+            password: 0,
+          },
+        }
+      )
+      .toArray()
+    return isUser || null
+  } catch (error) {
+    return null
+  }
+}
+
 export async function getUserProfile(username: string): Promise<IUser | null> {
   try {
     const user = await users
@@ -91,6 +132,19 @@ export async function findUserById(id: string): Promise<IUser | null> {
       }
     )
     return isUser || null
+  } catch (error) {
+    return null
+  }
+}
+export async function deleteUserByUsername(
+  username: string
+): Promise<boolean | null> {
+  try {
+    const isUser = await users.deleteOne({ username })
+    if (isUser.deletedCount === 1) {
+      return true
+    }
+    return false
   } catch (error) {
     return null
   }
