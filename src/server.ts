@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb'
-import { DB_NAME, URI, DB_PORT } from './utils/configs'
+import { DB_NAME, URI, PORT } from './utils/configs'
 import { setList, /*setListItem, setTaxonomies,*/ setUser } from './models'
 import { Application } from 'express'
 import { setItems } from './models/taxonomy-models'
@@ -31,8 +31,8 @@ export async function server(app: Application): Promise<void> {
       setList(client.db(DB_NAME).collection('lists'))
       // setListItem(client.db(DB_NAME).collection("lists"));
       setItems(client.db(DB_NAME).collection('taxonomies'))
-      app.listen(DB_PORT, () => {
-        console.info(`http://localhost:${DB_PORT}`)
+      app.listen(PORT, () => {
+        console.info(`http://localhost:${PORT}`)
       })
     } catch (error) {
       console.error('cannot set the collection')
