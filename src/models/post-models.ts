@@ -7,7 +7,10 @@ export const setPosts = (t: Collection): void => {
 }
 export async function createPost(post: IPost): Promise<ISalioResponse<string>> {
   try {
-    const newPost = await postsCollection.insertOne({ ...post })
+    const newPost = await postsCollection.insertOne({
+      ...post,
+      createAt: Date.now(),
+    })
 
     if (newPost.result.n === 1) {
       return {

@@ -14,6 +14,7 @@ export async function addUser(user: IUser): Promise<boolean> {
       username,
       password,
       role: 'user',
+      createAt: Date.now(),
     })
     return newUser.result.n === 1
   } catch (error) {
