@@ -25,3 +25,15 @@ export const PORT: number = process.env.PORT ? Number(process.env.PORT) : 9090
 export const SECRET_TOKEN: string = process.env.SECRET_TOKEN
   ? process.env.SECRET_TOKEN
   : 'salioilasilasdfjlasdkjfklasldfklasdf'
+
+export const allowedOrigins = {
+  origin: [
+    'http://localhost',
+    'http://localhost:3000',
+    'localhost',
+    'http://127.0.0.1/',
+    '127.0.0.1/',
+    'http://127.0.0.1:3000/',
+  ],
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+}

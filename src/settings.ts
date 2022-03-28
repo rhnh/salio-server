@@ -9,13 +9,10 @@ import errorHandler from 'errorhandler'
 import { authentication, authorization } from './utils/user-manager'
 import passport from 'passport'
 import cors from 'cors'
+import { allowedOrigins } from './utils/configs'
 
 export function setup(app: Application): void {
   app.use(helmet())
-  const allowedOrigins = {
-    origin: 'http://localhost:3000',
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  }
 
   app.use(cors(allowedOrigins))
   app.use(morgan('dev'))
@@ -23,7 +20,6 @@ export function setup(app: Application): void {
   app.use(json())
   authorization()
   authentication()
-
 
   app.use(passport.initialize())
   //Routers

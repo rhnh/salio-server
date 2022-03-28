@@ -114,6 +114,7 @@ export async function getTaxonomiesCtr(
     // if (!errors.isEmpty()) {
     //   return res.status(400).json({ errors: errors.array() })
     // }
+    // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
 
     const isTaxonomies = await getTaxonomies()
 
