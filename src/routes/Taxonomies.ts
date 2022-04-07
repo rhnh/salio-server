@@ -1,5 +1,6 @@
 import { Response, Request } from 'express'
 import { validationResult } from 'express-validator'
+// import { networkInterfaces } from 'os'
 import {
   createTaxonomy,
   getTaxonomies,
@@ -105,17 +106,37 @@ export async function updateTaxonomyCTRL(
     return res.json(error)
   }
 }
+// eslint-disable-next-line @typescript-eslint/ban-types
+export const getObjectKeyValue = <T extends object, U extends keyof T>(
+  key: U
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+) => (obj: T) => obj[key]
 export async function getTaxonomiesCtr(
-  _: Request,
+  req: Request,
   res: Response
 ): Promise<Response> {
   try {
-    // const errors = validationResult(req)
-    // if (!errors.isEmpty()) {
-    //   return res.status(400).json({ errors: errors.array() })
-    // }
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
     // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    // const nets = networkInterfaces()
+    // const results = Object.create(null) // Or just '{}', an empty object
 
+    // for (const name of Object.keys(nets)) {
+    //   if (nets[name])
+    //     for (const net of getObjectKeyValue<any, string>(name)(nets)) {
+    //       // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+    //       if (net.family === 'IPv4' && !net.internal) {
+    //         if (!results[name]) {
+    //           results[name] = []
+    //         }
+    //         results[name].push(net.address)
+    //       }
+    //     }
+    // }
+    // console.log('ip: ', ip, results)
     const isTaxonomies = await getTaxonomies()
 
     if (isTaxonomies.length > 0) {

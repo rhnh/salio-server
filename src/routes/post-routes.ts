@@ -23,7 +23,7 @@ postRouter.post(
 postRouter.get('/', asyncFn(getPostsCtrl))
 
 //get post by id
-postRouter.get('/:postId', asyncFn(getPostByIdCtrl))
+postRouter.get('/post/:id', asyncFn(getPostByIdCtrl))
 
 //get featured post
 postRouter.get('/featured', asyncFn(getFeaturedPostCtrl))

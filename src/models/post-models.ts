@@ -1,6 +1,6 @@
 import { IPost, ISalioResponse } from '../types'
 
-import { Collection } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 let postsCollection: Collection
 export const setPosts = (t: Collection): void => {
   postsCollection = t
@@ -34,10 +34,10 @@ export async function createPost(post: IPost): Promise<ISalioResponse<string>> {
 export async function getPostById(id: string): Promise<ISalioResponse<string>> {
   try {
     const foundPost = await postsCollection.findOne({
-      _id: id,
+      _id: new ObjectId(id),
     })
     if (foundPost) {
-      return { done: true, data: foundPost }
+      return { done: true, ...foundPost }
     }
     return {
       done: false,

@@ -76,6 +76,7 @@ userRouter.post(
 
     const bearer = authorization?.split(/\s/)[1]
     const result = await verifyToken(bearer || '')
+
     if (result && result?.isValidToken) {
       res.status(200)
       return res.json({ ...result })

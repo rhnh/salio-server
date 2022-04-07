@@ -69,7 +69,7 @@ export async function getPostByIdCtrl(
   res: Response
 ): Promise<Response> {
   try {
-    const { id } = req.body
+    const { id } = req.params
     const post = await getPostById(id)
     return res.json(post)
   } catch (error) {
