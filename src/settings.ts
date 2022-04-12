@@ -26,8 +26,7 @@ export function setup(app: Application): void {
   app.use('/api', AppRouter)
   app.use(passport.initialize())
 
-  app.use('/status', express.static('build'))
-  app.use('/', express.static('build'))
+  app.use('/static', express.static(__dirname + '/public'))
 
   process.env.NODE_ENV && process.env.NODE_ENV === 'development'
     ? app.use(errorHandler)

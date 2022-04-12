@@ -8,6 +8,8 @@ import {
   getFeaturedPost,
   getPostById,
   getPosts,
+  setFeaturedPost,
+  unFeaturedPost,
 } from '../models/post-models'
 
 export async function createPostCTRL(
@@ -71,6 +73,7 @@ export async function getPostByIdCtrl(
   try {
     const { id } = req.params
     const post = await getPostById(id)
+
     return res.json(post)
   } catch (error) {
     throw new Error('Cannot get posts. Something went wrong on server')
@@ -83,6 +86,33 @@ export async function getFeaturedPostCtrl(
   try {
     const post = await getFeaturedPost()
     return res.json(post)
+  } catch (error) {
+    throw new Error('Cannot get posts. Something went wrong on server')
+  }
+}
+export async function setFeaturedPostCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { id } = req.params
+    console.log(id, setFeaturedPost.name)
+    const isIt = await setFeaturedPost(id)
+
+    return res.json(isIt)
+  } catch (error) {
+    throw new Error('Cannot get posts. Something went wrong on server')
+  }
+}
+
+export async function unFeaturedPostCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { id } = req.params
+    const isIt = await unFeaturedPost(id)
+    return res.json(isIt)
   } catch (error) {
     throw new Error('Cannot get posts. Something went wrong on server')
   }

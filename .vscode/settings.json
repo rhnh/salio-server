@@ -1,6 +1,6 @@
 {
   "cSpell.language": "en",
-  "cSpell.words": ["Salio", "signup", "tsbuildinfo"],
+  "cSpell.words": ["Salio", "signup", "tsbuildinfo", "unfeatured"],
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -22,5 +22,5 @@
     ".gitignore": true,
     "package.json": true
   },
-  "workbench.colorTheme": "Default Light+"
+  "workbench.colorTheme": "Visual Studio Blue"
 }

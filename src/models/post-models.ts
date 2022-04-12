@@ -52,25 +52,14 @@ export async function getPostById(id: string): Promise<ISalioResponse<string>> {
     }
   }
 }
-export async function getFeaturedPost(): Promise<ISalioResponse<string>> {
+export async function getFeaturedPost(): Promise<IPost[] | null> {
   try {
-    const foundPost = await postsCollection.findOne({
+    const foundPosts = await postsCollection.find({
       featured: true,
     })
-    if (foundPost) {
-      return { done: true, data: foundPost }
-    }
-    return {
-      done: false,
-      data: null,
-      message: 'no Post found',
-    }
+    return await foundPosts.toArray()
   } catch (error) {
-    return {
-      done: false,
-      data: null,
-      message: 'error',
-    }
+    return null
   }
 }
 
@@ -78,13 +67,54 @@ export async function setFeaturedPost(
   id: string
 ): Promise<ISalioResponse<string>> {
   try {
-    const updatedPost = postsCollection.updateOne(
+    const updatedPost = await postsCollection.updateOne(
       {
-        _id: id,
+        _id: new ObjectId(id),
       },
-      { featured: true }
+      {
+        $set: {
+          featured: true,
+        },
+      }
     )
-    if ((await updatedPost).modifiedCount === 1) {
+
+    if (updatedPost.modifiedCount === 1) {
+      return {
+        done: true,
+        message: 'success updated the Post',
+      }
+    }
+    console.log('this is thing not working!', id)
+    return {
+      done: false,
+      data: null,
+    }
+  } catch (err: unknown) {
+    const error = err as Error
+    return {
+      done: false,
+      message: 'error, something went wrong',
+      error: error,
+    }
+  }
+}
+
+export async function unFeaturedPost(
+  id: string
+): Promise<ISalioResponse<string>> {
+  try {
+    const updatedPost = await postsCollection.updateOne(
+      {
+        _id: new ObjectId(id),
+      },
+      {
+        $set: {
+          featured: false,
+        },
+      }
+    )
+
+    if (updatedPost.modifiedCount === 1) {
       return {
         done: true,
         message: 'success updated the Post',
