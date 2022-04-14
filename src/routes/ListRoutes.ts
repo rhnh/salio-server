@@ -53,6 +53,19 @@ listRouter.post(
   verifyUser,
   asyncFn(routes.addListItemCtrl)
 )
+// *remove new Taxonomy to the list
+listRouter.delete(
+  '/list/:listName',
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
+  body('englishName').not().isEmpty().trim().isLength({
+    min: 3,
+  }),
+  body('taxonomy').not().isEmpty().trim().isLength({
+    min: 3,
+  }),
+  verifyUser,
+  asyncFn(routes.removeListItemCtrl)
+)
 
 /**
  * GET
@@ -81,4 +94,12 @@ listRouter.get(
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
   asyncFn(routes.getTotalItemsCtrl)
+)
+
+//get All ids of birds from any list
+listRouter.post(
+  '/birds/:username',
+  param('username').not().isEmpty().trim(),
+  verifyUser,
+  asyncFn(routes.getUsersBirdIdsCtrl)
 )

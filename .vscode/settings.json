@@ -1,6 +1,6 @@
 {
   "cSpell.language": "en",
-  "cSpell.words": ["Salio", "signup", "tsbuildinfo", "unfeatured"],
+  "cSpell.words": ["Salio", "signup", "tsbuildinfo", "unfeatured", "upserted"],
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,

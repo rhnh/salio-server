@@ -162,6 +162,7 @@ export async function getListByIDCtrl(
     })
   }
 }
+
 //Add specific Specific Taxonomy to user list
 export async function addListItemCtrl(
   req: Request,
@@ -217,6 +218,53 @@ export async function addListItemCtrl(
         message: 'Something went wrong',
       })
     }
+  } catch (error) {
+    const err = error as Error
+    return res.status(500).json({
+      done: false,
+      error: true,
+      message: err.message,
+    })
+  }
+}
+//Add specific Specific Taxonomy to user list
+export async function removeListItemCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+  const { englishName, taxonomy, location } = req.body
+  const { listName } = req.params
+  if (englishName === '' || taxonomy === '') {
+    res.status(409)
+    return res.json({
+      message: httpStatus.badRequest,
+    })
+  }
+  try {
+    const isTaxonomy = await getTaxonomy(englishName, taxonomy)
+
+    const { _id } = ((await isTaxonomy) as ITaxonomy) || ''
+    if (_id) {
+      const done = await ListModel.deleteListItem({
+        username,
+        listName,
+        taxonomyId: _id,
+        location,
+      })
+      if (done) {
+        return res.json({
+          done: true,
+          message: 'successfully added',
+        })
+      } else {
+        return res.status(404).json({
+          done: false,
+          message: 'Something went wrong',
+        })
+      }
+    }
+    return res.status(404).json({})
   } catch (error) {
     const err = error as Error
     return res.status(500).json({
@@ -314,6 +362,25 @@ export async function removeItemsCtrl(
       taxonomyId,
     })
     return res.json({ done, message: 'successfully delete it' })
+  } catch (error) {
+    const err = error as Error
+    return res.status(500).json({
+      done: false,
+      error: true,
+      message: err.message,
+    })
+  }
+}
+
+export async function getUsersBirdIdsCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+  try {
+    const ids = await ListModel.getUsersBirdIds(username)
+
+    return res.json(ids)
   } catch (error) {
     const err = error as Error
     return res.status(500).json({

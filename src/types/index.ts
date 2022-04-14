@@ -3,7 +3,7 @@
  * @internal
  */
 
-import { NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 interface IBaseModel {
   _id?: string

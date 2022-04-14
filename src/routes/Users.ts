@@ -40,6 +40,7 @@ export async function registerUser(
           message: `You have successfully register`,
           done,
           status: httpStatus.ok,
+          data: { username },
         })
       : res.json({
           status: httpStatus.badRequest,

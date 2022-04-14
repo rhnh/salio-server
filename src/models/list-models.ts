@@ -266,7 +266,33 @@ export async function createListItem(param: IParam): Promise<boolean> {
         },
       }
     )
-    if (isAdd.upsertedId) {
+    if (isAdd.matchedCount === 1) {
+      return true
+    }
+    return false
+  } catch (error) {
+    return false
+  }
+}
+
+export async function deleteListItem(param: IParam): Promise<boolean> {
+  const { username, listName, taxonomyId } = param
+  try {
+    if (!taxonomyId) {
+      return false
+    }
+
+    const isAdd = await lists.updateOne(
+      { username, slug: listName },
+      {
+        $pull: {
+          birdIds: {
+            birdId: new ObjectID(taxonomyId),
+          },
+        },
+      }
+    )
+    if (isAdd.matchedCount === 1) {
       return true
     }
     return false
@@ -294,5 +320,41 @@ export async function removeListItem(param: IParam): Promise<boolean> {
     return hasRemoved.result.ok === 1
   } catch (error) {
     return false
+  }
+}
+
+export async function getUsersBirdIds(username: string): Promise<string[]> {
+  try {
+    const birdIds = await lists
+      .aggregate([
+        {
+          $unwind: {
+            path: '$birdIds',
+          },
+        },
+        {
+          $match: {
+            username,
+          },
+        },
+        {
+          $project: {
+            birdIds: 1,
+            _id: 0,
+          },
+        },
+        {
+          $group: {
+            _id: '$birdIds.birdId',
+          },
+        },
+      ])
+      .toArray()
+    const ids: string[] = birdIds as string[]
+    const values = ids.map((id) => Object.values(id)) || []
+    const result = values.flat()
+    return result
+  } catch (error) {
+    return []
   }
 }
