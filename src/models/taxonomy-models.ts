@@ -19,7 +19,7 @@ export async function createTaxonomy(
       ...taxonomy,
       category: category || 'species',
       approved: false,
-      createAt: Date.now(),
+      createdAt: Date.now(),
     })
     if (hasItem.result.n === 1) {
       return {

@@ -13,7 +13,7 @@ export async function create({ username, listName }: IList): Promise<boolean> {
       username,
       listName,
       slug: slugify(listName),
-      createAt: Date.now(),
+      createdAt: Date.now(),
     })
     return newList.result.n === 1
   } catch (error) {
@@ -229,7 +229,7 @@ export async function getListsByUsername({
             username: 1,
             _id: 1,
             listName: 1,
-            createAt: 1,
+            createdAt: 1,
             location: 1,
             slug: 1,
           },

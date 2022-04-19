@@ -9,7 +9,7 @@ export async function createPost(post: IPost): Promise<ISalioResponse<string>> {
   try {
     const newPost = await postsCollection.insertOne({
       ...post,
-      createAt: Date.now(),
+      createdAt: Date.now(),
     })
 
     if (newPost.result.n === 1) {

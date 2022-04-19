@@ -7,7 +7,7 @@ import { NextFunction, Request, Response } from 'express'
 
 interface IBaseModel {
   _id?: string
-  createAt?: Date
+  createdAt?: number
 }
 
 export type ICategories = 'species' | 'genus' | 'family' | 'order'

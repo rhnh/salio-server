@@ -22,6 +22,8 @@ export async function createTaxonomyCTRL(
   res: Response
 ): Promise<Response> {
   try {
+    const event: Date = new Date()
+    const today = event.setDate(event.getDate() + 1)
     const {
       englishName,
       category,
@@ -30,11 +32,15 @@ export async function createTaxonomyCTRL(
       taxonomy,
       sex,
     } = req.body as ITaxonomy
+
     const errors = validationResult(req)
+
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
     }
+
     const { username } = req.user as IUser
+
     const item: ITaxonomy = {
       englishName,
       category,
@@ -43,10 +49,12 @@ export async function createTaxonomyCTRL(
       parent,
       ancestors,
       taxonomy,
-      createAt: new Date(Date.now()),
+      createdAt: today,
       approved: false,
     }
+
     const hasItem = await createTaxonomy(item)
+
     if (hasItem.done) {
       return res.status(httpStatus.ok).json({
         done: true,
