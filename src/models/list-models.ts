@@ -1,4 +1,4 @@
-import { Cursor, Collection, ObjectID } from 'mongodb'
+import { Cursor, Collection, ObjectID, ObjectId } from 'mongodb'
 import slugify from 'slugify'
 import { IList } from '../types'
 let lists: Collection
@@ -184,13 +184,18 @@ export async function getListItems(param: IList): Promise<Cursor> {
   }
 }
 
-export async function updateList(
-  { listName, username }: IList,
+export async function hasUpdateList({
+  _id,
+  username,
+  newName,
+}: {
+  _id: string
+  username: string
   newName: string
-): Promise<boolean> {
+}): Promise<boolean> {
   try {
     const hasUpdatedList = await lists.updateOne(
-      { username, listName },
+      { username, _id: new ObjectId(_id) },
       {
         $set: {
           listName: newName,

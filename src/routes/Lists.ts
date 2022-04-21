@@ -162,6 +162,38 @@ export async function getListByIDCtrl(
     })
   }
 }
+//update user's specific list
+export async function updateListByIDCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+  const { listId } = req.params
+  const newName = req.body
+  try {
+    const hasUpdated = await ListModel.hasUpdateList({
+      _id: listId,
+      username,
+      newName,
+    })
+    if (hasUpdated) {
+      return res.status(httpStatus.ok).json({
+        message: `You have successfully updated!`,
+        done: true,
+      })
+    }
+    return res
+      .status(httpStatus.badRequest)
+      .json({ message: 'no list found', done: false })
+  } catch (error) {
+    const err = error as Error
+    return res.status(500).json({
+      done: false,
+      error: true,
+      message: err.message,
+    })
+  }
+}
 
 //Add specific Specific Taxonomy to user list
 export async function addListItemCtrl(
