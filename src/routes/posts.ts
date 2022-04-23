@@ -96,7 +96,7 @@ export async function setFeaturedPostCtrl(
 ): Promise<Response> {
   try {
     const { id } = req.params
-    console.log(id, setFeaturedPost.name)
+
     const isIt = await setFeaturedPost(id)
 
     return res.json(isIt)

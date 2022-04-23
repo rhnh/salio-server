@@ -103,13 +103,11 @@ listRouter.post(
   verifyUser,
   asyncFn(routes.getUsersBirdIdsCtrl)
 )
-
+//edit list
 listRouter.put(
-  '/list/:listId',
-  param('listId').not().isEmpty().trim(),
-  body('newName').not().isEmpty().trim().isLength({
-    min: 3,
-  }),
+  '/list/:slug',
+  param('slug').not().isEmpty().trim(),
+
   verifyUser,
   asyncFn(routes.updateListByIDCtrl)
 )

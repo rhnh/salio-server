@@ -1,4 +1,4 @@
-import { Cursor, Collection, ObjectID, ObjectId } from 'mongodb'
+import { Cursor, Collection, ObjectId } from 'mongodb'
 import slugify from 'slugify'
 import { IList } from '../types'
 let lists: Collection
@@ -185,23 +185,25 @@ export async function getListItems(param: IList): Promise<Cursor> {
 }
 
 export async function hasUpdateList({
-  _id,
+  slug,
   username,
-  newName,
+  newListName,
 }: {
-  _id: string
+  slug: string
   username: string
-  newName: string
+  newListName: string
 }): Promise<boolean> {
   try {
     const hasUpdatedList = await lists.updateOne(
-      { username, _id: new ObjectId(_id) },
+      { username, slug },
       {
         $set: {
-          listName: newName,
+          listName: newListName,
+          slug: slugify(newListName),
         },
       }
     )
+
     return hasUpdatedList.result.n === 1
   } catch (error) {
     return false
@@ -264,7 +266,7 @@ export async function createListItem(param: IParam): Promise<boolean> {
       {
         $push: {
           birdIds: {
-            birdId: new ObjectID(taxonomyId),
+            birdId: new ObjectId(taxonomyId),
             location,
             seen: Date.now(),
           },
@@ -292,7 +294,7 @@ export async function deleteListItem(param: IParam): Promise<boolean> {
       {
         $pull: {
           birdIds: {
-            birdId: new ObjectID(taxonomyId),
+            birdId: new ObjectId(taxonomyId),
           },
         },
       }
@@ -317,7 +319,7 @@ export async function removeListItem(param: IParam): Promise<boolean> {
       {
         $pull: {
           birdIds: {
-            birdId: new ObjectID(taxonomyId),
+            birdId: new ObjectId(taxonomyId),
           },
         },
       }

@@ -168,13 +168,20 @@ export async function updateListByIDCtrl(
   res: Response
 ): Promise<Response> {
   const { username } = req.user as IUser
-  const { listId } = req.params
-  const newName = req.body
+  const { slug } = req.params
+  const { newListName } = req.body
+
+  if (newListName === '') {
+    return res.status(400).json({
+      message: 'Invalid',
+      done: false,
+    })
+  }
   try {
     const hasUpdated = await ListModel.hasUpdateList({
-      _id: listId,
+      slug,
       username,
-      newName,
+      newListName,
     })
     if (hasUpdated) {
       return res.status(httpStatus.ok).json({

@@ -84,7 +84,7 @@ export async function setFeaturedPost(
         message: 'success updated the Post',
       }
     }
-    console.log('this is thing not working!', id)
+
     return {
       done: false,
       data: null,
