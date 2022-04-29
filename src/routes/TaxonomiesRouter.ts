@@ -1,13 +1,14 @@
 import { Router } from 'express'
-import { body } from 'express-validator'
+import { body, param } from 'express-validator'
 
 import { asyncFn } from '../utils/helpers'
 import { verifyUser } from '../utils/user-manager'
 import {
-  createTaxonomyCTRL,
-  getTaxonomiesCtr,
-  getTaxonomyByIdCtrl,
-  getTaxonomySpeciesCtr,
+  createCTRL,
+  getCtr,
+  getByIdCtrl,
+  getSpeciesCtr,
+  getByTaxonomyNameCtrl,
 } from './Taxonomies'
 
 export const taxonomyRouter = Router()
@@ -30,14 +31,23 @@ taxonomyRouter.post(
   body(['taxonomy', 'category']).not().isEmpty().trim().isLength({ min: 3 }),
   body('ancestors').isArray(),
   verifyUser,
-  asyncFn(createTaxonomyCTRL)
+  asyncFn(createCTRL)
 )
 
-taxonomyRouter.get('/', getTaxonomiesCtr)
-taxonomyRouter.get('/species', verifyUser, getTaxonomySpeciesCtr)
+taxonomyRouter.get('/', getCtr)
+
+taxonomyRouter.get('/species', getSpeciesCtr)
 
 taxonomyRouter.get(
-  '/taxonomy/:taxonomyId',
+  '/id/:id',
+  param('id').notEmpty().trim(),
   verifyUser,
-  asyncFn(getTaxonomyByIdCtrl)
+  asyncFn(getByIdCtrl)
+)
+
+taxonomyRouter.get(
+  '/taxonomyName/:taxonomyName',
+  param('taxonomyName').notEmpty().trim(),
+  verifyUser,
+  asyncFn(getByTaxonomyNameCtrl)
 )

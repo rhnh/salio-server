@@ -1,13 +1,7 @@
 import { Response, Request } from 'express'
 import { validationResult } from 'express-validator'
 // import { networkInterfaces } from 'os'
-import {
-  createTaxonomy,
-  getTaxonomies,
-  getTaxonomyById,
-  getTaxonomySpecies,
-  updateTaxonomy,
-} from '../models/taxonomy-models'
+import * as modal from '../models/taxonomy-models'
 
 import { httpStatus, ITaxonomy, IUser } from '../types'
 /**
@@ -17,7 +11,7 @@ import { httpStatus, ITaxonomy, IUser } from '../types'
  * @returns - Response Object
  */
 
-export async function createTaxonomyCTRL(
+export async function createCTRL(
   req: Request,
   res: Response
 ): Promise<Response> {
@@ -26,10 +20,10 @@ export async function createTaxonomyCTRL(
     const today = event.setDate(event.getDate() + 1)
     const {
       englishName,
-      category,
+      rank: category,
       parent,
       ancestors,
-      taxonomy,
+      taxonomyName: taxonomy,
       sex,
     } = req.body as ITaxonomy
 
@@ -43,17 +37,17 @@ export async function createTaxonomyCTRL(
 
     const item: ITaxonomy = {
       englishName,
-      category,
+      rank: category,
       sex,
       username,
       parent,
       ancestors,
-      taxonomy,
+      taxonomyName: taxonomy,
       createdAt: today,
       approved: false,
     }
 
-    const hasItem = await createTaxonomy(item)
+    const hasItem = await modal.create(item)
 
     if (hasItem.done) {
       return res.status(httpStatus.ok).json({
@@ -68,7 +62,7 @@ export async function createTaxonomyCTRL(
   }
 }
 
-export async function updateTaxonomyCTRL(
+export async function updateCTRL(
   req: Request,
   res: Response
 ): Promise<Response> {
@@ -88,20 +82,20 @@ export async function updateTaxonomyCTRL(
     const { username } = req.user as IUser
     const t1: ITaxonomy = {
       englishName,
-      category,
+      rank: category,
       username,
-      taxonomy,
+      taxonomyName: taxonomy,
       approved: false,
     }
 
     const ut1: ITaxonomy = {
       englishName: englishName_new,
-      category: uCategory,
+      rank: uCategory,
       approved: false,
       username,
-      taxonomy: uTaxonomy,
+      taxonomyName: uTaxonomy,
     }
-    const hasItem = await updateTaxonomy(t1, ut1)
+    const hasItem = await modal.update(t1, ut1)
     if (hasItem.done) {
       return res.status(httpStatus.ok).json({
         done: true,
@@ -119,33 +113,14 @@ export const getObjectKeyValue = <T extends object, U extends keyof T>(
   key: U
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 ) => (obj: T) => obj[key]
-export async function getTaxonomiesCtr(
-  req: Request,
-  res: Response
-): Promise<Response> {
+export async function getCtr(req: Request, res: Response): Promise<Response> {
   try {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
     }
-    // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-    // const nets = networkInterfaces()
-    // const results = Object.create(null) // Or just '{}', an empty object
 
-    // for (const name of Object.keys(nets)) {
-    //   if (nets[name])
-    //     for (const net of getObjectKeyValue<any, string>(name)(nets)) {
-    //       // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-    //       if (net.family === 'IPv4' && !net.internal) {
-    //         if (!results[name]) {
-    //           results[name] = []
-    //         }
-    //         results[name].push(net.address)
-    //       }
-    //     }
-    // }
-    // console.log('ip: ', ip, results)
-    const isTaxonomies = await getTaxonomies()
+    const isTaxonomies = await modal.get()
 
     if (isTaxonomies.length > 0) {
       return res.status(httpStatus.ok).json(isTaxonomies)
@@ -155,7 +130,7 @@ export async function getTaxonomiesCtr(
     return res.json(error)
   }
 }
-export async function getTaxonomySpeciesCtr(
+export async function getSpeciesCtr(
   req: Request,
   res: Response
 ): Promise<Response> {
@@ -165,8 +140,7 @@ export async function getTaxonomySpeciesCtr(
       return res.status(400).json({ errors: errors.array() })
     }
 
-    const isTaxonomies = await getTaxonomySpecies()
-
+    const isTaxonomies = await modal.getSpecies()
     if (isTaxonomies.length > 0) {
       return res.status(httpStatus.ok).json(isTaxonomies)
     }
@@ -175,7 +149,8 @@ export async function getTaxonomySpeciesCtr(
     return res.json(error)
   }
 }
-export async function getTaxonomyByIdCtrl(
+
+export async function getByIdCtrl(
   req: Request,
   res: Response
 ): Promise<Response> {
@@ -185,9 +160,30 @@ export async function getTaxonomyByIdCtrl(
       return res.status(400).json({ errors: errors.array() })
     }
 
-    const { taxonomyId } = req.params
+    const { id } = req.params
 
-    const taxonomy = await getTaxonomyById(taxonomyId)
+    const taxonomy = await modal.getById(id)
+    if (taxonomy) {
+      return res.status(200).send(taxonomy)
+    }
+    return res.status(httpStatus.badRequest).json({ done: false })
+  } catch (error) {
+    return res.json(error)
+  }
+}
+export async function getByTaxonomyNameCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
+    const { taxonomyName } = req.params
+
+    const taxonomy = await modal.getByTaxonomyName(taxonomyName)
     if (taxonomy) {
       return res.status(200).send(taxonomy)
     }

@@ -9,11 +9,11 @@ export const setItems = (t: Collection): void => {
   taxonomies = t
 }
 
-export async function createTaxonomy(
+export async function create(
   taxonomy: ITaxonomy
 ): Promise<ISalioResponse<string>> {
   const item: ITaxonomy = taxonomy as ITaxonomy
-  const { category } = item
+  const { rank: category } = item
   try {
     const hasItem = await taxonomies.insertOne({
       ...taxonomy,
@@ -40,7 +40,7 @@ export async function createTaxonomy(
   }
 }
 
-export async function updateTaxonomy(
+export async function update(
   taxonomy: ITaxonomy,
   uTaxonomy: ITaxonomy
 ): Promise<ISalioResponse<string>> {
@@ -74,7 +74,7 @@ export async function updateTaxonomy(
   }
 }
 
-export async function getUserTaxonomy({
+export async function getByUser({
   username,
   listName,
 }: IList): Promise<ITaxonomy[] | []> {
@@ -97,23 +97,23 @@ export async function getUserTaxonomy({
     ])
     return await birds.toArray()
   } catch (error) {
-    console.error('something went wrong', getUserTaxonomy.name, error)
+    console.error('something went wrong', getByUser.name, error)
     return []
   }
 }
 
-export async function getTaxonomy(
-  englishName: string,
-  taxonomy: string
-): Promise<ITaxonomy | null> {
+export async function getByTaxonomyName(
+  taxonomyName: string
+): Promise<ITaxonomy[] | null> {
+  const t = new RegExp(taxonomyName, 'i')
   try {
-    const isTaxonomy = await taxonomies.findOne({
-      englishName,
-      taxonomy,
+    const isTaxonomy = await taxonomies.find({
+      taxonomyName: { $regex: t },
+      approved: true,
     })
-    return isTaxonomy
+    return await isTaxonomy.toArray()
   } catch (error) {
-    console.error('error', getTaxonomy.name)
+    console.error('error', getByTaxonomyName.name)
     return null
   }
 }
@@ -134,11 +134,11 @@ export async function addSpecies(
     })
     return isTaxonomy.insertedId
   } catch (error) {
-    console.error('error', getTaxonomy.name)
+    console.error('error', addSpecies.name)
     return ''
   }
 }
-export async function getTaxonomies(): Promise<ITaxonomy[]> {
+export async function get(): Promise<ITaxonomy[]> {
   try {
     const isTaxonomy = await taxonomies.find({
       approved: true,
@@ -150,28 +150,27 @@ export async function getTaxonomies(): Promise<ITaxonomy[]> {
 
     return isTaxonomy.toArray()
   } catch (error) {
-    console.error('error', getTaxonomy.name)
+    console.error('error', get.name)
     return []
   }
 }
-export async function getTaxonomySpecies(): Promise<ITaxonomy[]> {
+
+export async function getSpecies(): Promise<ITaxonomy[]> {
   try {
-    const isTaxonomy = await taxonomies
-      .find({
-        approved: true,
-        englishName: { $ne: null },
-      })
-      .project({
-        englishName: 1,
-        taxonomy: 1,
-      })
+    const isTaxonomy = await taxonomies.find({
+      approved: true,
+      englishName: { $ne: null },
+      rank: /species/i,
+    })
+
     return isTaxonomy.toArray()
   } catch (error) {
-    console.error('error', getTaxonomy.name)
+    console.error('error', getSpecies.name)
     return []
   }
 }
-export async function getTaxonomyById(_id: string): Promise<ITaxonomy | null> {
+
+export async function getById(_id: string): Promise<ITaxonomy | null> {
   try {
     const isTaxonomy = await taxonomies.findOne({
       // approved: true,
@@ -180,7 +179,23 @@ export async function getTaxonomyById(_id: string): Promise<ITaxonomy | null> {
 
     return (isTaxonomy as unknown) as ITaxonomy
   } catch (error) {
-    console.error('error', getTaxonomy.name)
+    console.error('error', getById.name)
+    return null
+  }
+}
+export async function getByApprovedSpecies(
+  englishName: string,
+  taxonomy: string
+): Promise<ITaxonomy | null> {
+  try {
+    const isTaxonomy = await taxonomies.findOne({
+      englishName,
+      taxonomy,
+      approved: true,
+    })
+    return isTaxonomy
+  } catch (error) {
+    console.error('error', getByApprovedSpecies.name)
     return null
   }
 }

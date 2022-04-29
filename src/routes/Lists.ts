@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import * as ListModel from '../models/list-models'
-import { addSpecies, getTaxonomy } from '../models/taxonomy-models'
+import { addSpecies, getByApprovedSpecies } from '../models/taxonomy-models'
 import { httpStatus, ITaxonomy, IUser } from '../types'
 
 //Create a new list
@@ -217,7 +217,7 @@ export async function addListItemCtrl(
     })
   }
   try {
-    const isTaxonomy = await getTaxonomy(englishName, taxonomy)
+    const isTaxonomy = await getByApprovedSpecies(englishName, taxonomy)
 
     const { _id } = ((await isTaxonomy) as ITaxonomy) || ''
     if (_id) {
@@ -281,7 +281,7 @@ export async function removeListItemCtrl(
     })
   }
   try {
-    const isTaxonomy = await getTaxonomy(englishName, taxonomy)
+    const isTaxonomy = await getByApprovedSpecies(englishName, taxonomy)
 
     const { _id } = ((await isTaxonomy) as ITaxonomy) || ''
     if (_id) {

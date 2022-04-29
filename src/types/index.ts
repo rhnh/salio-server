@@ -10,7 +10,7 @@ interface IBaseModel {
   createdAt?: number
 }
 
-export type ICategories = 'species' | 'genus' | 'family' | 'order'
+export type IRank = 'species' | 'genus' | 'family' | 'order'
 export type IGender = 'female' | 'male' | 'unknown'
 /**
  * - A Taxonomy can be specified for either a species, genus, family , order or even a bird itself.
@@ -21,8 +21,8 @@ export type IGender = 'female' | 'male' | 'unknown'
  */
 export interface ITaxonomy extends IBaseModel {
   englishName?: string // only species can have it.
-  taxonomy: string // It is a must for species: It should container binomial name
-  category: ICategories
+  taxonomyName: string // It is a must. It should container binomial name.
+  rank: IRank
   parent?: string
   approved: boolean
   username: string
