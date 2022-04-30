@@ -208,16 +208,16 @@ export async function addListItemCtrl(
   res: Response
 ): Promise<Response> {
   const { username } = req.user as IUser
-  const { englishName, taxonomy, location } = req.body
+  const { englishName, taxonomyName, location } = req.body
   const { listName } = req.params
-  if (englishName === '' || taxonomy === '') {
+  if (englishName === '' || taxonomyName === '') {
     res.status(409)
     return res.json({
       message: httpStatus.badRequest,
     })
   }
   try {
-    const isTaxonomy = await getByApprovedSpecies(englishName, taxonomy)
+    const isTaxonomy = await getByApprovedSpecies(englishName, taxonomyName)
 
     const { _id } = ((await isTaxonomy) as ITaxonomy) || ''
     if (_id) {
@@ -239,7 +239,7 @@ export async function addListItemCtrl(
         })
       }
     }
-    const taxonomyId = await addSpecies(englishName, taxonomy, location)
+    const taxonomyId = await addSpecies(englishName, taxonomyName, location)
     const done = await ListModel.createListItem({
       username,
       listName,

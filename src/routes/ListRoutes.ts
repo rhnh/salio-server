@@ -47,7 +47,7 @@ listRouter.post(
   body('englishName').not().isEmpty().trim().isLength({
     min: 3,
   }),
-  body('taxonomy').not().isEmpty().trim().isLength({
+  body('taxonomyName').not().isEmpty().trim().isLength({
     min: 3,
   }),
   verifyUser,

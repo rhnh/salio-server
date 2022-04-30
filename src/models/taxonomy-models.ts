@@ -120,13 +120,13 @@ export async function getByTaxonomyName(
 
 export async function addSpecies(
   englishName: string,
-  taxonomy: string,
+  taxonomyName: string,
   location: string
 ): Promise<string> {
   try {
     const slug = slugify(englishName)
     const isTaxonomy = await taxonomies.insertOne({
-      taxonomy,
+      taxonomyName,
       englishName,
       category: 'species',
       location,
@@ -185,12 +185,12 @@ export async function getById(_id: string): Promise<ITaxonomy | null> {
 }
 export async function getByApprovedSpecies(
   englishName: string,
-  taxonomy: string
+  taxonomyName: string
 ): Promise<ITaxonomy | null> {
   try {
     const isTaxonomy = await taxonomies.findOne({
       englishName,
-      taxonomy,
+      taxonomyName,
       approved: true,
     })
     return isTaxonomy
