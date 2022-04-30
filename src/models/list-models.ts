@@ -257,6 +257,7 @@ interface IParam {
 export async function createListItem(param: IParam): Promise<boolean> {
   const { username, listName, taxonomyId, location } = param
   try {
+    // check if it already exists
     if (!taxonomyId) {
       return false
     }

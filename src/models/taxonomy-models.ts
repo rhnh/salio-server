@@ -128,7 +128,7 @@ export async function addSpecies(
     const isTaxonomy = await taxonomies.insertOne({
       taxonomyName,
       englishName,
-      category: 'species',
+      rank: 'species',
       location,
       slug,
     })
@@ -138,6 +138,7 @@ export async function addSpecies(
     return ''
   }
 }
+
 export async function get(): Promise<ITaxonomy[]> {
   try {
     const isTaxonomy = await taxonomies.find({
