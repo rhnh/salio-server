@@ -1,4 +1,4 @@
-import { IPost, ISalioResponse } from '../types'
+import { IPost, ISalioResponse } from 'types'
 
 import { Collection, ObjectId } from 'mongodb'
 let postsCollection: Collection

@@ -1,8 +1,8 @@
 import { Router } from 'express'
 
 // import { body } from 'express-validator'
-import { asyncFn } from '../utils/helpers'
-import { verifyUser } from '../utils/user-manager'
+import { asyncFn } from '../../utils/helpers'
+import { verifyUser } from '../../utils/user-manager'
 // import { verifyUser } from '../utils/user-manager'
 import {
   createPostCTRL,
@@ -11,7 +11,7 @@ import {
   setFeaturedPostCtrl,
   getPostsCtrl,
   unFeaturedPostCtrl,
-} from './posts'
+} from '.'
 
 export const postRouter = Router()
 

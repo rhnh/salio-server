@@ -2,7 +2,7 @@
 
 import { Response, Request } from 'express'
 // import { findUserByUsername } from '../models/user-models'
-import { IPost } from '../types'
+import { IPost } from 'types'
 import {
   createPost,
   getFeaturedPost,
@@ -10,7 +10,7 @@ import {
   getPosts,
   setFeaturedPost,
   unFeaturedPost,
-} from '../models/post-models'
+} from './models'
 
 export async function createPostCTRL(
   req: Request,

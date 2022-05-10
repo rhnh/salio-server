@@ -1,0 +1,5 @@
+export const USERS = 'users'
+export const TAXONOMIES = 'taxonomies'
+export const LISTS = 'lists'
+export const NOTIFICATIONS = 'notifications'
+export const POSTS = 'posts'

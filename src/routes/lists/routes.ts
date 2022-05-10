@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import * as routes from './Lists'
+import * as routes from './controllers'
 import { param, body } from 'express-validator'
-import { verifyUser } from '../utils/user-manager'
-import { asyncFn } from '../utils/helpers'
+import { verifyUser } from 'utils/user-manager'
+import { asyncFn } from 'utils/helpers'
 
 export const listRouter = Router()
 

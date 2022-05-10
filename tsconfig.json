@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "src",
+    "rootDir": "./src",
     "strict": true,
     "declaration": true,
     "noImplicitReturns": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "esModuleInterop": true,
-    "lib": ["es2019"]
+    "lib": ["es2019"],
+    "baseUrl": "./src"
   },
   "exclude": ["node_modules", "../dist/build"],
   "include": ["./src/**/*.tsx", "./src/**/*.ts", "src/key-gen.ts"]

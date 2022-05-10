@@ -1,9 +1,9 @@
 import { Collection, ObjectID } from 'mongodb'
-import { IUser } from '../types'
+import { IUser } from 'types'
 
 let users: Collection
 
-export function setUser(collection: Collection): void {
+export function setUsers(collection: Collection): void {
   users = collection
 }
 

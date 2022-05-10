@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { asyncFn } from '../utils/helpers'
+import { asyncFn } from 'utils/helpers'
 import {
   changePassword,
   getUserProfileCtrl,
@@ -7,12 +7,12 @@ import {
   getMembersCtrl,
   setPrivilegeCtrl,
   deleteUserCtrl,
-} from './Users'
+} from './controllers'
 // import { body } from 'express-validator'
 import passport from 'passport'
-import { httpStatus, IUser } from '../types'
-import { createAccountLimiter } from '../utils/basic-manager'
-import { generateToken, verifyToken, verifyUser } from '../utils/user-manager'
+import { httpStatus, IUser } from 'types'
+import { createAccountLimiter } from 'utils/basic-manager'
+import { generateToken, verifyToken, verifyUser } from 'utils/user-manager'
 import { param } from 'express-validator'
 
 export const userRouter = Router()
@@ -40,10 +40,9 @@ userRouter.post('/user', passport.authenticate('local'), (req, res) => {
   }
 })
 //profile
-userRouter.post(
+userRouter.get(
   '/user/profile/:username',
   param('username').not().isEmpty().trim().isLength({ min: 3 }),
-  verifyUser,
   asyncFn(getUserProfileCtrl)
 )
 

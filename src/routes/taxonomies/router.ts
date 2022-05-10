@@ -1,15 +1,16 @@
 import { Router } from 'express'
 import { body, param } from 'express-validator'
 
-import { asyncFn } from '../utils/helpers'
-import { verifyUser } from '../utils/user-manager'
+import { asyncFn } from 'utils/helpers'
+import { verifyUser } from 'utils/user-manager'
 import {
   createCTRL,
   getCtr,
   getByIdCtrl,
   getSpeciesCtr,
+  getSpeciesNameCtrl,
   getByTaxonomyNameCtrl,
-} from './Taxonomies'
+} from './controllers'
 
 export const taxonomyRouter = Router()
 /**
@@ -45,9 +46,10 @@ taxonomyRouter.get(
   asyncFn(getByIdCtrl)
 )
 
+taxonomyRouter.get('/names', verifyUser, asyncFn(getSpeciesNameCtrl))
+
 taxonomyRouter.get(
   '/taxonomyName/:taxonomyName',
-  param('taxonomyName').notEmpty().trim(),
   verifyUser,
   asyncFn(getByTaxonomyNameCtrl)
 )

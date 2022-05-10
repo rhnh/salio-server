@@ -2,8 +2,8 @@
   "private": true,
   "scripts": {
     "build:watch": "tsc -b --watch",
-    "dev": "nodemon ./dist/index.js",
-    "start": "node ./dist/index.js",
+    "dev": "NODE_PATH=./dist nodemon ./dist/index.js",
+    "start": "NODE_PATH=./dist node ./dist/index.js",
     "build": "rimraf dist *.tsbuildinfo && tsc -b"
   },
   "devDependencies": {

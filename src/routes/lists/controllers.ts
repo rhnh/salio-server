@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
-import * as ListModel from '../models/list-models'
-import { addSpecies, getByApprovedSpecies } from '../models/taxonomy-models'
-import { httpStatus, ITaxonomy, IUser } from '../types'
+import * as ListModel from './models'
+import { addSpecies, getByApprovedSpecies } from 'routes/taxonomies/models'
+import { httpStatus, ITaxonomy, IUser } from 'types'
 
 //Create a new list
 export async function createListCtrl(
@@ -210,6 +210,7 @@ export async function addListItemCtrl(
   const { username } = req.user as IUser
   const { englishName, taxonomyName, location } = req.body
   const { listName } = req.params
+  console.log(englishName, taxonomyName, listName, username)
   if (englishName === '' || taxonomyName === '') {
     res.status(409)
     return res.json({
@@ -217,9 +218,12 @@ export async function addListItemCtrl(
     })
   }
   try {
-    const isTaxonomy = await getByApprovedSpecies(englishName, taxonomyName)
+    const isApprovedTaxonomy = await getByApprovedSpecies(
+      englishName,
+      taxonomyName
+    )
 
-    const { _id } = ((await isTaxonomy) as ITaxonomy) || ''
+    const { _id } = ((await isApprovedTaxonomy) as ITaxonomy) || ''
     if (_id) {
       const done = await ListModel.createListItem({
         username,
@@ -240,6 +244,7 @@ export async function addListItemCtrl(
       }
     }
     const taxonomyId = await addSpecies(englishName, taxonomyName, location)
+
     const done = await ListModel.createListItem({
       username,
       listName,

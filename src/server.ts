@@ -1,11 +1,15 @@
 import { MongoClient } from 'mongodb'
 import { DB_NAME, URI, PORT } from './utils/configs'
-import { setList, /*setListItem, setTaxonomies,*/ setUser } from './models'
+import { setLists } from 'routes/lists/models'
+import { setUsers } from 'routes/users/models'
 import { Application } from 'express'
-import { setItems } from './models/taxonomy-models'
-import { setPosts } from './models/post-models'
+import { setPosts } from 'routes/posts/models'
+import { setTaxonomies } from 'routes/taxonomies/models'
+import { setNotifications } from 'routes/notifications/models'
+import { USERS, NOTIFICATIONS, LISTS, TAXONOMIES, POSTS } from 'utils/const'
 
 const client = new MongoClient(URI, { useUnifiedTopology: true })
+
 export async function server(app: Application): Promise<void> {
   try {
     await client.connect()
@@ -17,20 +21,24 @@ export async function server(app: Application): Promise<void> {
         .listCollections()
         .toArray()
       if (existingCollections.length <= 0) {
-        await client.db(DB_NAME).createCollection('users')
-        await client.db(DB_NAME).createCollection('taxonomies')
-        await client.db(DB_NAME).createCollection('lists')
+        await client.db(DB_NAME).createCollection(USERS)
+        await client.db(DB_NAME).createCollection(TAXONOMIES)
+        await client.db(DB_NAME).createCollection(LISTS)
+        await client.db(DB_NAME).createCollection(POSTS)
+        await client.db(DB_NAME).createCollection(NOTIFICATIONS)
       }
     } catch (error) {
-      console.error('Cannot create collections, missing database name')
+      console.error(
+        `Cannot create collections, missing database name for the ${URI}`
+      )
       process.exit(1)
     }
     try {
-      setUser(client.db(DB_NAME).collection('users'))
-      setPosts(client.db(DB_NAME).collection('posts'))
-      setList(client.db(DB_NAME).collection('lists'))
-      // setListItem(client.db(DB_NAME).collection("lists"));
-      setItems(client.db(DB_NAME).collection('taxonomies'))
+      setUsers(client.db(DB_NAME).collection(USERS))
+      setPosts(client.db(DB_NAME).collection(POSTS))
+      setLists(client.db(DB_NAME).collection(LISTS))
+      setNotifications(client.db(DB_NAME).collection(NOTIFICATIONS))
+      setTaxonomies(client.db(DB_NAME).collection(TAXONOMIES))
       app.listen(PORT, () => {
         console.info(`http://localhost:${PORT}`)
       })

@@ -8,9 +8,9 @@ import {
   getAllUsers,
   getUserProfile,
   setPrivilege,
-} from '../models/user-models'
-import { httpStatus, IUser } from '../types'
-import { generatePassword } from '../utils/password'
+} from './models'
+import { httpStatus, IUser } from 'types'
+import { generatePassword } from 'utils/password'
 
 export async function registerUser(
   req: Request,

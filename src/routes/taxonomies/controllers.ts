@@ -1,16 +1,16 @@
 import { Response, Request } from 'express'
 import { validationResult } from 'express-validator'
 // import { networkInterfaces } from 'os'
-import * as modal from '../models/taxonomy-models'
+import * as modal from './models'
 
-import { httpStatus, ITaxonomy, IUser } from '../types'
+import { httpStatus, ITaxonomy, IUser } from 'types'
+
 /**
  *
  * @param req - req.params.listName
  * @param res - res
  * @returns - Response Object
  */
-
 export async function createCTRL(
   req: Request,
   res: Response
@@ -108,6 +108,7 @@ export async function updateCTRL(
     return res.json(error)
   }
 }
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const getObjectKeyValue = <T extends object, U extends keyof T>(
   key: U
@@ -130,6 +131,7 @@ export async function getCtr(req: Request, res: Response): Promise<Response> {
     return res.json(error)
   }
 }
+
 export async function getSpeciesCtr(
   req: Request,
   res: Response
@@ -171,6 +173,7 @@ export async function getByIdCtrl(
     return res.json(error)
   }
 }
+
 export async function getByTaxonomyNameCtrl(
   req: Request,
   res: Response
@@ -190,5 +193,17 @@ export async function getByTaxonomyNameCtrl(
     return res.status(httpStatus.badRequest).json({ done: false })
   } catch (error) {
     return res.json(error)
+  }
+}
+
+export async function getSpeciesNameCtrl(
+  _: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const names = await modal.getNames()
+    return res.json(names)
+  } catch (error) {
+    throw new Error(getSpeciesNameCtrl.name)
   }
 }

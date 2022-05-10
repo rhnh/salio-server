@@ -1,11 +1,11 @@
-import { IList, ISalioResponse, ITaxonomy } from '../types'
-
+import { IList, ISalioResponse, ITaxonomy } from 'types'
 import { Collection, ObjectID } from 'mongodb'
+
 import slugify from 'slugify'
 
 let taxonomies: Collection
 
-export const setItems = (t: Collection): void => {
+export const setTaxonomies = (t: Collection): void => {
   taxonomies = t
 }
 
@@ -184,6 +184,7 @@ export async function getById(_id: string): Promise<ITaxonomy | null> {
     return null
   }
 }
+
 export async function getByApprovedSpecies(
   englishName: string,
   taxonomyName: string
@@ -195,6 +196,22 @@ export async function getByApprovedSpecies(
       approved: true,
     })
     return isTaxonomy
+  } catch (error) {
+    console.error('error', getByApprovedSpecies.name)
+    return null
+  }
+}
+export async function getNames(): Promise<ITaxonomy[] | null> {
+  try {
+    const isTaxonomy = await taxonomies
+      .find({
+        approved: true,
+      })
+      .project({
+        englishName: 1,
+      })
+
+    return isTaxonomy.toArray()
   } catch (error) {
     console.error('error', getByApprovedSpecies.name)
     return null

@@ -1,10 +1,10 @@
 import { Router } from 'express'
-
-import { listRouter } from './ListRoutes'
-import { MainRouter } from './MainRouter'
-import { postRouter } from './post-routes'
-import { taxonomyRouter } from './TaxonomiesRouter'
-import { userRouter } from './UserRouter'
+import { MainRouter } from 'routes/main/MainRouter'
+import { listRouter } from 'routes/lists/routes'
+import { postRouter } from 'routes/posts/routes'
+import { taxonomyRouter } from './taxonomies/router'
+import { userRouter } from './users/routes'
+import { notificationsRouter } from './notifications/routes'
 
 export const AppRouter = Router()
 
@@ -13,3 +13,4 @@ AppRouter.use('/lists', listRouter)
 AppRouter.use('/taxonomies', taxonomyRouter)
 AppRouter.use('/users', userRouter)
 AppRouter.use('/posts', postRouter)
+AppRouter.use('/notifications', notificationsRouter)

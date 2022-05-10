@@ -6,7 +6,7 @@ import { IUser } from '../types'
 import { isVerifiedPass } from './password'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt'
-import { findUserById, findUserByUsername } from '../models/user-models'
+import { findUserById, findUserByUsername } from 'routes/users/models'
 import { genKeyPair } from '../key-gen'
 
 const PUBLIC_KEY_PATH = path.join(__dirname, '..', 'id_rsa_pub.pem')

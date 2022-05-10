@@ -1,9 +1,9 @@
 import { Cursor, Collection, ObjectId } from 'mongodb'
 import slugify from 'slugify'
-import { IList } from '../types'
+import { IList } from 'types'
 let lists: Collection
 
-export function setList(collection: Collection): void {
+export function setLists(collection: Collection): void {
   lists = collection
 }
 
@@ -117,7 +117,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
                 {
                   id: '$birds._id',
                   listName: '$birds.name',
-                  seen: '$birdIds.seen',
+                  createdAt: '$birdIds.createdAt',
                   taxonomy: '$birds.taxonomy',
                   location: '$birds.location',
                   englishName: '$birds.englishName',
@@ -147,7 +147,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
           _id: {
             id: '$birds.id',
             listName: '$birds.listName',
-            seen: '$birds.seen',
+            createdAt: '$birds.createdAt',
             taxonomy: '$birds.taxonomy',
             englishName: '$birds.englishName',
             location: '$birds.location',
@@ -164,7 +164,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
       {
         $project: {
           _id: '$birds.id',
-          seen: '$birds.seen',
+          createdAt: '$birds.createdAt',
           taxonomy: '$birds.taxonomy',
           englishName: '$birds.englishName',
           location: '$birds.location',
@@ -263,13 +263,13 @@ export async function createListItem(param: IParam): Promise<boolean> {
     }
 
     const isAdd = await lists.updateOne(
-      { username, slug: listName },
+      { username, slug: slugify(listName) },
       {
         $push: {
           birdIds: {
             birdId: new ObjectId(taxonomyId),
             location,
-            seen: Date.now(),
+            createdAt: Date.now(),
           },
         },
       }
