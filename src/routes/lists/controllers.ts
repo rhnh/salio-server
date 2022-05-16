@@ -210,7 +210,7 @@ export async function addListItemCtrl(
   const { username } = req.user as IUser
   const { englishName, taxonomyName, location } = req.body
   const { listName } = req.params
-  console.log(englishName, taxonomyName, listName, username)
+
   if (englishName === '' || taxonomyName === '') {
     res.status(409)
     return res.json({

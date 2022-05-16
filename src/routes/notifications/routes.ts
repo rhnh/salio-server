@@ -34,6 +34,7 @@ notificationsRouter.post(
 notificationsRouter.put(
   '/notification/:id',
   param('id').notEmpty().trim(),
+  body('active').notEmpty(),
   verifyUser,
   asyncFn(controllers.setActiveByIdCtrl)
 )

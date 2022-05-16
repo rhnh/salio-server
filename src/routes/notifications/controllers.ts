@@ -58,6 +58,7 @@ export async function setActiveByIdCtrl(
 ): Promise<Response> {
   const { role } = req.user as IUser
   const { id } = req.params
+  const { isActive } = req.body
 
   if (role === 'user' || role === undefined) {
     return res.status(409).json({
@@ -65,7 +66,7 @@ export async function setActiveByIdCtrl(
     })
   }
   try {
-    const done = await models.setActiveById(id, true)
+    const done = await models.setActiveById(id, isActive)
     if (done) {
       return res.status(200).json({ message: 'has been successfully added' })
     }
@@ -107,10 +108,7 @@ export async function getActiveCtrl(
 ): Promise<Response> {
   try {
     const ns = await models.getActive()
-    if (ns) {
-      return res.status(200).json(ns)
-    }
-    return res.status(400).json({ message: 'Please try again!' })
+    return res.json(ns)
   } catch (error) {
     return res.status(500).json({
       message: getNotificationsCtrl.name,

@@ -1,4 +1,5 @@
 import { Collection, ObjectID } from 'mongodb'
+import { purgeUserList } from 'routes/lists/models'
 import { IUser } from 'types'
 
 let users: Collection
@@ -34,6 +35,7 @@ export async function findUserByUsername(
     return null
   }
 }
+
 export async function setPrivilege(
   username: string,
   role: string
@@ -142,9 +144,11 @@ export async function deleteUserByUsername(
 ): Promise<boolean | null> {
   try {
     const isUser = await users.deleteOne({ username })
-    if (isUser.deletedCount === 1) {
+    const UserList = await purgeUserList(username)
+    if (isUser.deletedCount === 1 && UserList) {
       return true
     }
+
     return false
   } catch (error) {
     return null
@@ -165,5 +169,28 @@ export async function changeUserPassword(
     return hasPasswordChange.result.n === 1
   } catch (error) {
     return false
+  }
+}
+
+export async function changeAvatar(
+  username: string,
+  url: string
+): Promise<boolean | null> {
+  try {
+    const isUser = await users.updateOne(
+      {
+        username,
+      },
+      {
+        $set: { avatar: url },
+      }
+    )
+
+    if (isUser.result.n === 1) {
+      return true
+    }
+    return false
+  } catch (error) {
+    return null
   }
 }

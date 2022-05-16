@@ -4,6 +4,7 @@ import { validationResult } from 'express-validator'
 import * as modal from './models'
 
 import { httpStatus, ITaxonomy, IUser } from 'types'
+import { IRank, isRank } from './types'
 
 /**
  *
@@ -196,7 +197,7 @@ export async function getByTaxonomyNameCtrl(
   }
 }
 
-export async function getSpeciesNameCtrl(
+export async function getByEnglishName(
   _: Request,
   res: Response
 ): Promise<Response> {
@@ -204,6 +205,54 @@ export async function getSpeciesNameCtrl(
     const names = await modal.getNames()
     return res.json(names)
   } catch (error) {
-    throw new Error(getSpeciesNameCtrl.name)
+    throw new Error(getByEnglishName.name)
+  }
+}
+
+export async function getPaginatedCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const limit: number = ((req.query?.limit as unknown) as number) || 10
+    const page: number = (req.query.page as unknown) as number
+    const ts = await modal.paginatedTaxonomies({
+      page: Number(page),
+      limit: Number(limit),
+    })
+    const r = { ...ts }
+    return res.status(200).json({
+      page: r.page,
+      totalItems: r.totalItems,
+      hasNextPage: r.hasNextPage,
+      hasPreviousPage: r.hasPreviousPage,
+      nextPage: r.hasNextPage ? Number(page) + 1 : undefined,
+      previousPage: r.hasPreviousPage ? page - 1 : undefined,
+      items: r.items,
+    })
+  } catch (error) {
+    return res.json(500).json({
+      done: false,
+      message: `Something went wrong ${getPaginatedCtrl.name}`,
+    })
+  }
+}
+
+export async function getByRankCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const rank = (req.params?.rank as IRank) || ''
+    if (!isRank(rank)) {
+      return res.status(400).json({ message: 'Invalid Rank', done: false })
+    }
+    const ranks = await modal.getByRank({ rank })
+    return res.json(ranks)
+  } catch (error) {
+    return res.json(500).json({
+      done: false,
+      message: `Something went wrong ${getPaginatedCtrl.name}`,
+    })
   }
 }

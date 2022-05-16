@@ -8,7 +8,11 @@ let taxonomies: Collection
 export const setTaxonomies = (t: Collection): void => {
   taxonomies = t
 }
-
+/**
+ *
+ * @param taxonomy a Taxonomy
+ * @returns
+ */
 export async function create(
   taxonomy: ITaxonomy
 ): Promise<ISalioResponse<string>> {
@@ -111,7 +115,9 @@ export async function getByTaxonomyName(
       taxonomyName: { $regex: t },
       approved: true,
     })
-    return await isTaxonomy.toArray()
+    const tr = await isTaxonomy.toArray()
+
+    return tr
   } catch (error) {
     console.error('error', getByTaxonomyName.name)
     return null
@@ -216,4 +222,126 @@ export async function getNames(): Promise<ITaxonomy[] | null> {
     console.error('error', getByApprovedSpecies.name)
     return null
   }
+}
+interface MYResult {
+  page: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  totalPages: number
+  totalItems: number
+  items: ITaxonomy[]
+}
+export async function paginatedTaxonomies({
+  page,
+}: {
+  page: number
+  limit: number
+}): Promise<MYResult | null> {
+  try {
+    const ts = await taxonomies.aggregate(paginationPipeLine(page))
+
+    const f = await ts.toArray()
+
+    const r = f[0] as MYResult
+
+    return r
+  } catch (error) {
+    return null
+  }
+}
+
+export async function getByRank({
+  rank,
+}: {
+  rank: string
+}): Promise<ITaxonomy[]> {
+  console.log(rank)
+  try {
+    const ts = await taxonomies
+      .find({ rank, approved: true, englishName: { $ne: null } })
+      .project({
+        taxonomyName: 1,
+        englishName: 1,
+      })
+      .sort({ taxonomyName: 1, englishName: 1 })
+    const f = await ts.toArray()
+
+    return f as ITaxonomy[]
+  } catch (error) {
+    return []
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const paginationPipeLine = (page = 1) => {
+  const limit = 4
+  const skip = (Math.ceil(page) - 1) * limit
+
+  return [
+    {
+      $match: {
+        approved: true,
+        englishName: { $ne: null },
+        rank: /species/i,
+      },
+    },
+    {
+      $sort: {
+        taxonomyName: -1,
+      },
+    },
+
+    {
+      $facet: {
+        total: [
+          {
+            $count: 'count',
+          },
+        ],
+        items: [
+          {
+            $addFields: {
+              _id: '$_id',
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: '$total',
+    },
+
+    {
+      $project: {
+        items: {
+          $slice: [
+            '$items',
+            skip,
+            {
+              $ifNull: [limit, '$total.count'],
+            },
+          ],
+        },
+        page: {
+          $literal: skip / limit + 1,
+        },
+        hasNextPage: {
+          $lt: [{ $multiply: [limit, Math.ceil(page)] }, '$total.count'],
+        },
+        hasPreviousPage: {
+          $cond: [
+            { $eq: [Math.ceil(page), 0] },
+            false,
+            { $gt: [Math.ceil(page), Math.ceil(page) - 1] },
+          ],
+        },
+        totalPages: {
+          $ceil: {
+            $divide: ['$total.count', limit],
+          },
+        },
+        totalItems: '$total.count',
+      },
+    },
+  ]
 }
