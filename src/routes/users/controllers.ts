@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import {
   addUser,
+  changeAvatar,
   changeUserPassword,
   deleteUserByUsername,
   findUserByUsername,
@@ -178,6 +179,33 @@ export async function deleteUserCtrl(
     })
   } catch (error) {
     console.warn('error', getMembersCtrl.name)
+    return res.json({ done: false, error: true })
+  }
+}
+
+export async function changeAvatarCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { url } = req.body
+    const { username } = req.user as IUser
+
+    console.log(username)
+    const isSuccess = await changeAvatar(username, url)
+    if (isSuccess) {
+      return res.status(200).send({
+        message: `You granted {username} changed to mode`,
+        done: false,
+      })
+    }
+    return res.status(400).send({
+      message: `Something went wrong`,
+      done: false,
+    })
+  } catch (error) {
+    console.warn('error', changeAvatarCtrl.name, error)
+
     return res.json({ done: false, error: true })
   }
 }

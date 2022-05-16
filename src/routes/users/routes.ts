@@ -7,6 +7,7 @@ import {
   getMembersCtrl,
   setPrivilegeCtrl,
   deleteUserCtrl,
+  changeAvatarCtrl,
 } from './controllers'
 // import { body } from 'express-validator'
 import passport from 'passport'
@@ -85,3 +86,6 @@ userRouter.post(
     }
   })
 )
+
+//change Avatar
+userRouter.post('/change-avatar', verifyUser, asyncFn(changeAvatarCtrl))
