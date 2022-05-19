@@ -16,15 +16,13 @@ export const setTaxonomies = (t: Collection): void => {
 export async function create(
   taxonomy: ITaxonomy
 ): Promise<ISalioResponse<string>> {
-  const item: ITaxonomy = taxonomy as ITaxonomy
-  const { rank: category } = item
   try {
     const hasItem = await taxonomies.insertOne({
       ...taxonomy,
-      category: category || 'species',
       approved: false,
       createdAt: Date.now(),
     })
+    console.log(hasItem.result)
     if (hasItem.result.n === 1) {
       return {
         done: true,
@@ -255,15 +253,112 @@ export async function getByRank({
 }: {
   rank: string
 }): Promise<ITaxonomy[]> {
-  console.log(rank)
   try {
+    const r = new RegExp(rank, 'i')
     const ts = await taxonomies
-      .find({ rank, approved: true, englishName: { $ne: null } })
+      .find({ rank: r, approved: true, englishName: { $ne: null } })
       .project({
         taxonomyName: 1,
         englishName: 1,
+        parent: 1,
+        ancestors: 1,
       })
-      .sort({ taxonomyName: 1, englishName: 1 })
+      .sort({ taxonomyName: 1 })
+    const f = await ts.toArray()
+
+    return f as ITaxonomy[]
+  } catch (error) {
+    return []
+  }
+}
+export async function getUnApproved(): Promise<ITaxonomy[]> {
+  try {
+    const ts = await taxonomies.aggregate([
+      {
+        $match: {
+          approved: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          pipeline: [
+            {
+              $match: {
+                $or: [
+                  {
+                    role: 'admin',
+                  },
+                  {
+                    role: 'mod',
+                  },
+                ],
+              },
+            },
+            {
+              $project: {
+                role: 1,
+                username: 1,
+                _id: 0,
+              },
+            },
+          ],
+          as: 'users',
+        },
+      },
+      {
+        $unwind: {
+          path: '$users',
+        },
+      },
+      {
+        $addFields: {
+          role: '$users.role',
+          contributor: '$users.username',
+        },
+      },
+      {
+        $project: {
+          users: 0,
+        },
+      },
+    ])
+    const f = await ts.toArray()
+    return f as ITaxonomy[]
+  } catch (error) {
+    return []
+  }
+}
+export async function getByAncestors({
+  parent,
+  rank,
+}: {
+  parent: string
+  rank: string
+}): Promise<ITaxonomy[]> {
+  try {
+    const p = new RegExp(parent, 'i')
+    const r = new RegExp(rank, 'i')
+    console.log(p, r)
+    const ts = await taxonomies.aggregate([
+      {
+        $match: {
+          ancestors: p,
+          rank: r,
+          approved: true,
+        },
+      },
+      {
+        $project: {
+          ancestors: 1,
+          _id: 0,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ])
+
     const f = await ts.toArray()
 
     return f as ITaxonomy[]

@@ -17,38 +17,24 @@ export async function createCTRL(
   res: Response
 ): Promise<Response> {
   try {
+    const { username } = req.user as IUser
+
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
     const event: Date = new Date()
     const today = event.setDate(event.getDate() + 1)
-    const {
-      englishName,
-      rank: category,
-      parent,
-      ancestors,
-      taxonomyName: taxonomy,
-      sex,
-    } = req.body as ITaxonomy
-
+    const t = req.body as ITaxonomy
+    console.log(t)
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
     }
 
-    const { username } = req.user as IUser
+    const taxonomy = { ...t, createdAt: today }
 
-    const item: ITaxonomy = {
-      englishName,
-      rank: category,
-      sex,
-      username,
-      parent,
-      ancestors,
-      taxonomyName: taxonomy,
-      createdAt: today,
-      approved: false,
-    }
-
-    const hasItem = await modal.create(item)
+    const hasItem = await modal.create(taxonomy)
 
     if (hasItem.done) {
       return res.status(httpStatus.ok).json({
@@ -67,6 +53,10 @@ export async function updateCTRL(
   req: Request,
   res: Response
 ): Promise<Response> {
+  const { username } = req.user as IUser
+  if (!username) {
+    return res.status(404).json({ done: 'you are logged in!' })
+  }
   try {
     const {
       englishName,
@@ -117,6 +107,10 @@ export const getObjectKeyValue = <T extends object, U extends keyof T>(
 ) => (obj: T) => obj[key]
 export async function getCtr(req: Request, res: Response): Promise<Response> {
   try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -138,6 +132,10 @@ export async function getSpeciesCtr(
   res: Response
 ): Promise<Response> {
   try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -158,6 +156,10 @@ export async function getByIdCtrl(
   res: Response
 ): Promise<Response> {
   try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -180,6 +182,10 @@ export async function getByTaxonomyNameCtrl(
   res: Response
 ): Promise<Response> {
   try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
@@ -198,10 +204,14 @@ export async function getByTaxonomyNameCtrl(
 }
 
 export async function getByEnglishName(
-  _: Request,
+  req: Request,
   res: Response
 ): Promise<Response> {
   try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
     const names = await modal.getNames()
     return res.json(names)
   } catch (error) {
@@ -214,6 +224,11 @@ export async function getPaginatedCtrl(
   res: Response
 ): Promise<Response> {
   try {
+    const { username } = req.user as IUser
+    console.log(username)
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
     const limit: number = ((req.query?.limit as unknown) as number) || 10
     const page: number = (req.query.page as unknown) as number
     const ts = await modal.paginatedTaxonomies({
@@ -243,12 +258,56 @@ export async function getByRankCtrl(
   res: Response
 ): Promise<Response> {
   try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
     const rank = (req.params?.rank as IRank) || ''
     if (!isRank(rank)) {
       return res.status(400).json({ message: 'Invalid Rank', done: false })
     }
     const ranks = await modal.getByRank({ rank })
     return res.json(ranks)
+  } catch (error) {
+    return res.json(500).json({
+      done: false,
+      message: `Something went wrong ${getPaginatedCtrl.name}`,
+    })
+  }
+}
+export async function getByAncestorsCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
+    const parent = req.params?.parent || ''
+    const rank = req.params?.rank || ''
+    const ancestors = await modal.getByAncestors({ parent, rank })
+    return res.json([...ancestors])
+  } catch (error) {
+    return res.json(500).json({
+      done: false,
+      message: `Something went wrong ${getPaginatedCtrl.name}`,
+    })
+  }
+}
+
+export async function getUnApprovedCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
+
+    const ancestors = await modal.getUnApproved()
+    return res.json([...ancestors])
   } catch (error) {
     return res.json(500).json({
       done: false,

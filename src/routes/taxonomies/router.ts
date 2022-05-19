@@ -11,6 +11,8 @@ import {
   getByTaxonomyNameCtrl,
   getPaginatedCtrl,
   getByRankCtrl,
+  getByAncestorsCtrl,
+  getUnApprovedCtrl,
 } from './controllers'
 
 export const taxonomyRouter = Router()
@@ -30,16 +32,18 @@ export const taxonomyRouter = Router()
  */
 taxonomyRouter.post(
   '/',
-  body('taxonomy').not().isEmpty().trim(),
+  body('ancestors').isArray().notEmpty(),
+  body('rank').notEmpty().trim(),
+  body('taxonomyName').notEmpty().trim(),
   verifyUser,
   asyncFn(createCTRL)
 )
 
 //get all
-taxonomyRouter.get('/', getCtr)
+taxonomyRouter.get('/', verifyUser, getCtr)
 
 //get only english name
-taxonomyRouter.get('/species', getSpeciesCtr)
+taxonomyRouter.get('/species', verifyUser, getSpeciesCtr)
 
 //get by id
 taxonomyRouter.get(
@@ -62,7 +66,7 @@ taxonomyRouter.get(
   verifyUser,
   asyncFn(getByTaxonomyNameCtrl)
 )
-
+//get paginated
 taxonomyRouter.get(
   '/paginated',
   verifyUser,
@@ -72,3 +76,11 @@ taxonomyRouter.get(
 )
 
 taxonomyRouter.get('/rank/:rank', verifyUser, asyncFn(getByRankCtrl))
+
+taxonomyRouter.get(
+  '/ancestors/:parent/:rank',
+  verifyUser,
+  asyncFn(getByAncestorsCtrl)
+)
+
+taxonomyRouter.get('/unapproved', verifyUser, asyncFn(getUnApprovedCtrl))
