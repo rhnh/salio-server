@@ -320,12 +320,28 @@ export async function getUnApprovedCtrl(
       return res.status(404).json({ done: 'you are logged in!' })
     }
 
-    const ancestors = await modal.getUnApproved()
-    return res.json([...ancestors])
+    const unapproved = await modal.getUnApproved()
+    return res.json([...unapproved])
   } catch (error) {
     return res.json(500).json({
       done: false,
       message: `Something went wrong ${getPaginatedCtrl.name}`,
     })
+  }
+}
+export async function delTaxByIdCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
+    const id = req.params?.id || ''
+    const names = await modal.delTaxById(id)
+    return res.json(names)
+  } catch (error) {
+    throw new Error(getByEnglishNameCtrl.name)
   }
 }

@@ -91,6 +91,14 @@ export async function setApprove(id: string): Promise<boolean> {
     return false
   }
 }
+export async function delTaxById(id: string): Promise<boolean> {
+  try {
+    const hasItem = await taxonomies.deleteOne({ _id: new ObjectId(id) })
+    return (await hasItem.result.n) === 1
+  } catch (nn) {
+    return false
+  }
+}
 
 export async function getByUser({
   username,

@@ -88,7 +88,7 @@ export const unApprovedPipe = [
                 role: 'admin',
               },
               {
-                role: 'mod',
+                role: 'con',
               },
             ],
           },
@@ -96,7 +96,6 @@ export const unApprovedPipe = [
         {
           $project: {
             role: 1,
-            username: 1,
             _id: 0,
           },
         },
@@ -112,7 +111,6 @@ export const unApprovedPipe = [
   {
     $addFields: {
       role: '$users.role',
-      contributor: '$users.username',
     },
   },
   {
@@ -128,6 +126,7 @@ export const ancestorsPipeLine = ({
 }: {
   p: RegExp
   r: RegExp
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any[] => [
   {
     $match: {

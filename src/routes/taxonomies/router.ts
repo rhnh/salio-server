@@ -14,6 +14,7 @@ import {
   getByAncestorsCtrl,
   getUnApprovedCtrl,
   setApprovedCtrl,
+  delTaxByIdCtrl,
 } from './controllers'
 
 export const taxonomyRouter = Router()
@@ -93,4 +94,11 @@ taxonomyRouter.post(
   param('id').notEmpty().trim(),
   verifyUser,
   asyncFn(setApprovedCtrl)
+)
+
+taxonomyRouter.delete(
+  '/taxonomy/:id',
+  param('id').notEmpty().trim(),
+  verifyUser,
+  asyncFn(delTaxByIdCtrl)
 )
