@@ -202,7 +202,7 @@ export async function getByTaxonomyNameCtrl(
   }
 }
 
-export async function getByEnglishName(
+export async function getByEnglishNameCtrl(
   req: Request,
   res: Response
 ): Promise<Response> {
@@ -214,7 +214,23 @@ export async function getByEnglishName(
     const names = await modal.getNames()
     return res.json(names)
   } catch (error) {
-    throw new Error(getByEnglishName.name)
+    throw new Error(getByEnglishNameCtrl.name)
+  }
+}
+export async function setApprovedCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are logged in!' })
+    }
+    const id = req.params?.id || ''
+    const names = await modal.setApprove(id)
+    return res.json(names)
+  } catch (error) {
+    throw new Error(getByEnglishNameCtrl.name)
   }
 }
 

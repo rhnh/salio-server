@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import {
   addUser,
@@ -201,6 +201,42 @@ export async function changeAvatarCtrl(
       message: `Something went wrong`,
       done: false,
     })
+  } catch (error) {
+    console.warn('error', changeAvatarCtrl.name, error)
+
+    return res.json({ done: false, error: true })
+  }
+}
+export async function isAdmin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> {
+  try {
+    const { username } = req.user as IUser
+    if (username === 'admin') {
+      return next()
+    } else {
+      return res.status(401).json({ message: 'you are not authorized!' })
+    }
+  } catch (error) {
+    console.warn('error', changeAvatarCtrl.name, error)
+
+    return res.json({ done: false, error: true })
+  }
+}
+export async function isMod(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> {
+  try {
+    const { username } = req.user as IUser
+    if (username === 'admin') {
+      return next()
+    } else {
+      return res.status(401).json({ message: 'you are not authorized!' })
+    }
   } catch (error) {
     console.warn('error', changeAvatarCtrl.name, error)
 

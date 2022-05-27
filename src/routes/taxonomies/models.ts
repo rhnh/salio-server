@@ -1,7 +1,13 @@
 import { IList, ISalioResponse, ITaxonomy } from 'types'
-import { Collection, ObjectID } from 'mongodb'
+import { Collection, ObjectId, ObjectID } from 'mongodb'
 
 import slugify from 'slugify'
+import {
+  ancestorsPipeLine,
+  getByUserPipeLine,
+  paginationPipeLine,
+  unApprovedPipe,
+} from './pipelines'
 
 let taxonomies: Collection
 
@@ -74,28 +80,26 @@ export async function update(
     }
   }
 }
+export async function setApprove(id: string): Promise<boolean> {
+  try {
+    const hasItem = await taxonomies.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { isApproved: true } }
+    )
+    return (await hasItem.result.n) === 1
+  } catch (nn) {
+    return false
+  }
+}
 
 export async function getByUser({
   username,
   listName,
 }: IList): Promise<ITaxonomy[] | []> {
   try {
-    const birds = await taxonomies.aggregate([
-      {
-        $match: {
-          listName,
-          username,
-        },
-      },
-      {
-        $lookup: {
-          from: 'taxonomies',
-          localField: 'birds.birdId',
-          foreignField: '_id',
-          as: 'string',
-        },
-      },
-    ])
+    const birds = await taxonomies.aggregate(
+      getByUserPipeLine({ username, listName })
+    )
     return await birds.toArray()
   } catch (error) {
     console.error('something went wrong', getByUser.name, error)
@@ -144,7 +148,7 @@ export async function addSpecies(
 
 export async function get(): Promise<ITaxonomy[]> {
   try {
-    const isTaxonomy = await taxonomies.find({
+    const isTaxonomy = taxonomies.find({
       isApproved: true,
     })
     // .project({
@@ -161,7 +165,7 @@ export async function get(): Promise<ITaxonomy[]> {
 
 export async function getSpecies(): Promise<ITaxonomy[]> {
   try {
-    const isTaxonomy = await taxonomies.find({
+    const isTaxonomy = taxonomies.find({
       isApproved: true,
       englishName: { $ne: null },
       rank: /species/i,
@@ -180,7 +184,6 @@ export async function getById(_id: string): Promise<ITaxonomy | null> {
       // isApproved: true,
       _id: new ObjectID(_id),
     })
-
     return (isTaxonomy as unknown) as ITaxonomy
   } catch (error) {
     console.error('error', getById.name)
@@ -206,7 +209,7 @@ export async function getByApprovedSpecies(
 }
 export async function getNames(): Promise<ITaxonomy[] | null> {
   try {
-    const isTaxonomy = await taxonomies
+    const isTaxonomy = taxonomies
       .find({
         isApproved: true,
       })
@@ -236,13 +239,9 @@ export async function paginatedTaxonomies({
   limit: number
 }): Promise<MYResult | null> {
   try {
-    const ts = await taxonomies.aggregate(paginationPipeLine(page))
-
+    const ts = taxonomies.aggregate(paginationPipeLine(page))
     const f = await ts.toArray()
-
-    const r = f[0] as MYResult
-
-    return r
+    return f[0] as MYResult
   } catch (error) {
     return null
   }
@@ -255,7 +254,7 @@ export async function getByRank({
 }): Promise<ITaxonomy[]> {
   try {
     const r = new RegExp(rank, 'i')
-    const ts = await taxonomies
+    const ts = taxonomies
       .find({ rank: r, isApproved: true, englishName: { $ne: null } })
       .project({
         taxonomyName: 1,
@@ -264,65 +263,14 @@ export async function getByRank({
         ancestors: 1,
       })
       .sort({ taxonomyName: 1 })
-    const f = await ts.toArray()
-
-    return f as ITaxonomy[]
+    return (await ts.toArray()) as ITaxonomy[]
   } catch (error) {
     return []
   }
 }
 export async function getUnApproved(): Promise<ITaxonomy[]> {
   try {
-    const ts = await taxonomies.aggregate([
-      {
-        $match: {
-          isApproved: false,
-        },
-      },
-      {
-        $lookup: {
-          from: 'users',
-          pipeline: [
-            {
-              $match: {
-                $or: [
-                  {
-                    role: 'admin',
-                  },
-                  {
-                    role: 'mod',
-                  },
-                ],
-              },
-            },
-            {
-              $project: {
-                role: 1,
-                username: 1,
-                _id: 0,
-              },
-            },
-          ],
-          as: 'users',
-        },
-      },
-      {
-        $unwind: {
-          path: '$users',
-        },
-      },
-      {
-        $addFields: {
-          role: '$users.role',
-          contributor: '$users.username',
-        },
-      },
-      {
-        $project: {
-          users: 0,
-        },
-      },
-    ])
+    const ts = taxonomies.aggregate(unApprovedPipe)
     const f = await ts.toArray()
     return f as ITaxonomy[]
   } catch (error) {
@@ -339,103 +287,9 @@ export async function getByAncestors({
   try {
     const p = new RegExp(parent, 'i')
     const r = new RegExp(rank, 'i')
-    const ts = await taxonomies.aggregate([
-      {
-        $match: {
-          ancestors: p,
-          rank: r,
-          isApproved: true,
-        },
-      },
-      {
-        $project: {
-          ancestors: 1,
-          _id: 0,
-        },
-      },
-      {
-        $limit: 1,
-      },
-    ])
-
-    const f = await ts.toArray()
-
-    return f as ITaxonomy[]
+    const ts = await taxonomies.aggregate(ancestorsPipeLine({ p, r }))
+    return (await ts.toArray()) as ITaxonomy[]
   } catch (error) {
     return []
   }
-}
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const paginationPipeLine = (page = 1) => {
-  const limit = 4
-  const skip = (Math.ceil(page) - 1) * limit
-
-  return [
-    {
-      $match: {
-        isApproved: true,
-        englishName: { $ne: null },
-        rank: /species/i,
-      },
-    },
-    {
-      $sort: {
-        taxonomyName: -1,
-      },
-    },
-
-    {
-      $facet: {
-        total: [
-          {
-            $count: 'count',
-          },
-        ],
-        items: [
-          {
-            $addFields: {
-              _id: '$_id',
-            },
-          },
-        ],
-      },
-    },
-    {
-      $unwind: '$total',
-    },
-
-    {
-      $project: {
-        items: {
-          $slice: [
-            '$items',
-            skip,
-            {
-              $ifNull: [limit, '$total.count'],
-            },
-          ],
-        },
-        page: {
-          $literal: skip / limit + 1,
-        },
-        hasNextPage: {
-          $lt: [{ $multiply: [limit, Math.ceil(page)] }, '$total.count'],
-        },
-        hasPreviousPage: {
-          $cond: [
-            { $eq: [Math.ceil(page), 0] },
-            false,
-            { $gt: [Math.ceil(page), Math.ceil(page) - 1] },
-          ],
-        },
-        totalPages: {
-          $ceil: {
-            $divide: ['$total.count', limit],
-          },
-        },
-        totalItems: '$total.count',
-      },
-    },
-  ]
 }

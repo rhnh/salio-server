@@ -7,12 +7,13 @@ import {
   getCtr,
   getByIdCtrl,
   getSpeciesCtr,
-  getByEnglishName,
+  getByEnglishNameCtrl,
   getByTaxonomyNameCtrl,
   getPaginatedCtrl,
   getByRankCtrl,
   getByAncestorsCtrl,
   getUnApprovedCtrl,
+  setApprovedCtrl,
 } from './controllers'
 
 export const taxonomyRouter = Router()
@@ -56,7 +57,7 @@ taxonomyRouter.get(
 /**
  * english name
  */
-taxonomyRouter.get('/names', verifyUser, asyncFn(getByEnglishName))
+taxonomyRouter.get('/names', verifyUser, asyncFn(getByEnglishNameCtrl))
 
 /**
  * TaxonomyName
@@ -83,4 +84,13 @@ taxonomyRouter.get(
   asyncFn(getByAncestorsCtrl)
 )
 
+//get all unapproved taxonomies which are added only by mods/admin
 taxonomyRouter.get('/unapproved', verifyUser, asyncFn(getUnApprovedCtrl))
+
+//approved by id
+taxonomyRouter.post(
+  '/set-approve/:id',
+  param('id').notEmpty().trim(),
+  verifyUser,
+  asyncFn(setApprovedCtrl)
+)
