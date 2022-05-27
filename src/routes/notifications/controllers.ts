@@ -116,7 +116,7 @@ export async function getActiveCtrl(
   }
 }
 
-export async function deleteByIdCtrl(
+export async function delNotificationByIdCtrl(
   req: Request,
   res: Response
 ): Promise<Response> {

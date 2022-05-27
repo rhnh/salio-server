@@ -59,5 +59,5 @@ notificationsRouter.delete(
   '/notification/:id',
   param('id').notEmpty().trim(),
   verifyUser,
-  asyncFn(controllers.deleteByIdCtrl)
+  asyncFn(controllers.delNotificationByIdCtrl)
 )
