@@ -14,7 +14,7 @@ export interface ITaxonomy extends IBaseModel {
   taxonomyName: string // It is a must. It should container binomial name.
   rank: IRank
   parent?: string
-  approved: boolean
+  isApproved: boolean
   username: string
   slug?: string
   image?: string

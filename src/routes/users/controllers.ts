@@ -190,8 +190,6 @@ export async function changeAvatarCtrl(
   try {
     const { url } = req.body
     const { username } = req.user as IUser
-
-    console.log(username)
     const isSuccess = await changeAvatar(username, url)
     if (isSuccess) {
       return res.status(200).send({

@@ -19,10 +19,9 @@ export async function create(
   try {
     const hasItem = await taxonomies.insertOne({
       ...taxonomy,
-      approved: false,
+      isApproved: false,
       createdAt: Date.now(),
     })
-    console.log(hasItem.result)
     if (hasItem.result.n === 1) {
       return {
         done: true,
@@ -91,7 +90,7 @@ export async function getByUser({
       {
         $lookup: {
           from: 'taxonomies',
-          localField: 'birdIds.birdId',
+          localField: 'birds.birdId',
           foreignField: '_id',
           as: 'string',
         },
@@ -111,7 +110,7 @@ export async function getByTaxonomyName(
   try {
     const isTaxonomy = await taxonomies.find({
       taxonomyName: { $regex: t },
-      approved: true,
+      isApproved: true,
     })
     const tr = await isTaxonomy.toArray()
 
@@ -146,7 +145,7 @@ export async function addSpecies(
 export async function get(): Promise<ITaxonomy[]> {
   try {
     const isTaxonomy = await taxonomies.find({
-      approved: true,
+      isApproved: true,
     })
     // .project({
     //   englishName: 1,
@@ -163,7 +162,7 @@ export async function get(): Promise<ITaxonomy[]> {
 export async function getSpecies(): Promise<ITaxonomy[]> {
   try {
     const isTaxonomy = await taxonomies.find({
-      approved: true,
+      isApproved: true,
       englishName: { $ne: null },
       rank: /species/i,
     })
@@ -178,7 +177,7 @@ export async function getSpecies(): Promise<ITaxonomy[]> {
 export async function getById(_id: string): Promise<ITaxonomy | null> {
   try {
     const isTaxonomy = await taxonomies.findOne({
-      // approved: true,
+      // isApproved: true,
       _id: new ObjectID(_id),
     })
 
@@ -197,7 +196,7 @@ export async function getByApprovedSpecies(
     const isTaxonomy = await taxonomies.findOne({
       englishName,
       taxonomyName,
-      approved: true,
+      isApproved: true,
     })
     return isTaxonomy
   } catch (error) {
@@ -209,10 +208,11 @@ export async function getNames(): Promise<ITaxonomy[] | null> {
   try {
     const isTaxonomy = await taxonomies
       .find({
-        approved: true,
+        isApproved: true,
       })
       .project({
         englishName: 1,
+        taxonomyName: 1,
       })
 
     return isTaxonomy.toArray()
@@ -256,7 +256,7 @@ export async function getByRank({
   try {
     const r = new RegExp(rank, 'i')
     const ts = await taxonomies
-      .find({ rank: r, approved: true, englishName: { $ne: null } })
+      .find({ rank: r, isApproved: true, englishName: { $ne: null } })
       .project({
         taxonomyName: 1,
         englishName: 1,
@@ -276,7 +276,7 @@ export async function getUnApproved(): Promise<ITaxonomy[]> {
     const ts = await taxonomies.aggregate([
       {
         $match: {
-          approved: false,
+          isApproved: false,
         },
       },
       {
@@ -339,13 +339,12 @@ export async function getByAncestors({
   try {
     const p = new RegExp(parent, 'i')
     const r = new RegExp(rank, 'i')
-    console.log(p, r)
     const ts = await taxonomies.aggregate([
       {
         $match: {
           ancestors: p,
           rank: r,
-          approved: true,
+          isApproved: true,
         },
       },
       {
@@ -375,7 +374,7 @@ export const paginationPipeLine = (page = 1) => {
   return [
     {
       $match: {
-        approved: true,
+        isApproved: true,
         englishName: { $ne: null },
         rank: /species/i,
       },

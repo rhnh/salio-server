@@ -7,12 +7,12 @@ import { IBaseModel } from 'types'
 export interface IList extends IBaseModel {
   username: string
   listName: string
-  birdIds?: string[]
+  birds?: string[]
   slug?: string
 }
 
 export interface IListTaxonomy {
-  birdIds: [
+  birds: [
     {
       birdId: string
       createdAt: string

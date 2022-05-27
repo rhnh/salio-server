@@ -333,7 +333,7 @@ export async function getListItemsCtrl(
 
     const result = await birds.toArray()
 
-    return res.json(result)
+    return res.json(...result)
   } catch (error) {
     const err = error as Error
     return res.status(500).json({

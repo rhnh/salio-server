@@ -90,7 +90,7 @@ export async function getUserProfile(username: string): Promise<IUser | null> {
             as: 'listItems',
           },
         },
-        { $project: { password: 0, 'lists.birdIds': 0, 'lists.username': 0 } },
+        { $project: { password: 0, 'lists.birds': 0, 'lists.username': 0 } },
         { $addFields: { totalLists: { $size: '$listItems' } } },
         { $project: { listItems: 0 } },
       ])

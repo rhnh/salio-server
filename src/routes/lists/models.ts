@@ -1,4 +1,4 @@
-import { Cursor, Collection, ObjectId } from 'mongodb'
+import { Collection, Cursor, ObjectId } from 'mongodb'
 import slugify from 'slugify'
 import { IList } from 'types'
 let lists: Collection
@@ -7,6 +7,11 @@ export function setLists(collection: Collection): void {
   lists = collection
 }
 
+/**
+ *
+ * @param - username and listName
+ * @returns - a boolean value, if created the list or not
+ */
 export async function create({ username, listName }: IList): Promise<boolean> {
   try {
     const newList = await lists.insertOne({
@@ -21,6 +26,11 @@ export async function create({ username, listName }: IList): Promise<boolean> {
   }
 }
 
+/**
+ *
+ * @param - username and listName
+ * @returns - returns list with ids of birds
+ */
 export async function getListByName({
   username,
   listName,
@@ -35,6 +45,12 @@ export async function getListByName({
     return null
   }
 }
+/**
+ *
+ * @param - username  and listName
+ *
+ * @returns returns a
+ */
 export async function getListBySlug({
   username,
   listName,
@@ -80,100 +96,19 @@ export async function getTotalItems({
 export async function getListItems(param: IList): Promise<Cursor> {
   const { username, listName } = param
   try {
-    const listItems = lists?.aggregate([
+    const listItems = await lists?.aggregate([
       {
         $match: {
-          slug: listName,
           username,
+          listName,
         },
       },
       {
         $lookup: {
           from: 'taxonomies',
-          localField: 'birdIds.birdId',
+          localField: 'birds.birdId',
           foreignField: '_id',
           as: 'birds',
-        },
-      },
-      {
-        $unwind: {
-          path: '$birds',
-        },
-      },
-      {
-        $unwind: {
-          path: '$birdIds',
-        },
-      },
-      {
-        $group: {
-          _id: '$_id',
-          birds: {
-            $push: {
-              $cond: [
-                {
-                  $eq: ['$birds._id', '$birdIds.birdId'],
-                },
-                {
-                  id: '$birds._id',
-                  listName: '$birds.name',
-                  createdAt: '$birdIds.createdAt',
-                  taxonomy: '$birds.taxonomy',
-                  location: '$birds.location',
-                  englishName: '$birds.englishName',
-                  slug: '$birds.slug',
-                },
-                null,
-              ],
-            },
-          },
-        },
-      },
-      {
-        $unwind: {
-          path: '$birds',
-        },
-      },
-      {
-        $match: {
-          birds: {
-            $exists: true,
-            $ne: null,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            id: '$birds.id',
-            listName: '$birds.listName',
-            createdAt: '$birds.createdAt',
-            taxonomy: '$birds.taxonomy',
-            englishName: '$birds.englishName',
-            location: '$birds.location',
-            slug: '$birds.slug',
-          },
-        },
-      },
-      {
-        $project: {
-          birds: '$_id',
-          _id: 0,
-        },
-      },
-      {
-        $project: {
-          _id: '$birds.id',
-          createdAt: '$birds.createdAt',
-          taxonomy: '$birds.taxonomy',
-          englishName: '$birds.englishName',
-          location: '$birds.location',
-          slug: '$birds.slug',
-        },
-      },
-      {
-        $sort: {
-          englishName: 1,
         },
       },
     ])
@@ -264,7 +199,6 @@ interface IParam {
 export async function createListItem(param: IParam): Promise<boolean> {
   const { username, listName, taxonomyId, location } = param
   try {
-    // check if it already exists
     if (!taxonomyId) {
       return false
     }
@@ -273,7 +207,7 @@ export async function createListItem(param: IParam): Promise<boolean> {
       { username, slug: slugify(listName) },
       {
         $push: {
-          birdIds: {
+          birds: {
             birdId: new ObjectId(taxonomyId),
             location,
             createdAt: Date.now(),
@@ -301,7 +235,7 @@ export async function deleteListItem(param: IParam): Promise<boolean> {
       { username, slug: listName },
       {
         $pull: {
-          birdIds: {
+          birds: {
             birdId: new ObjectId(taxonomyId),
           },
         },
@@ -326,7 +260,7 @@ export async function removeListItem(param: IParam): Promise<boolean> {
       { username, listName },
       {
         $pull: {
-          birdIds: {
+          birds: {
             birdId: new ObjectId(taxonomyId),
           },
         },
@@ -344,7 +278,7 @@ export async function getUsersBirdIds(username: string): Promise<string[]> {
       .aggregate([
         {
           $unwind: {
-            path: '$birdIds',
+            path: '$birds',
           },
         },
         {
@@ -354,13 +288,13 @@ export async function getUsersBirdIds(username: string): Promise<string[]> {
         },
         {
           $project: {
-            birdIds: 1,
+            birds: 1,
             _id: 0,
           },
         },
         {
           $group: {
-            _id: '$birdIds.birdId',
+            _id: '$birds.birdId',
           },
         },
       ])

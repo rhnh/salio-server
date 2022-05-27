@@ -25,7 +25,6 @@ export async function createCTRL(
     const event: Date = new Date()
     const today = event.setDate(event.getDate() + 1)
     const t = req.body as ITaxonomy
-    console.log(t)
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -76,13 +75,13 @@ export async function updateCTRL(
       rank: category,
       username,
       taxonomyName: taxonomy,
-      approved: false,
+      isApproved: false,
     }
 
     const ut1: ITaxonomy = {
       englishName: englishName_new,
       rank: uCategory,
-      approved: false,
+      isApproved: false,
       username,
       taxonomyName: uTaxonomy,
     }
@@ -225,7 +224,6 @@ export async function getPaginatedCtrl(
 ): Promise<Response> {
   try {
     const { username } = req.user as IUser
-    console.log(username)
     if (!username) {
       return res.status(404).json({ done: 'you are logged in!' })
     }

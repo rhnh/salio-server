@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import * as routes from './controllers'
+import * as controllers from './controllers'
 import { param, body } from 'express-validator'
 import { verifyUser } from 'utils/user-manager'
 import { asyncFn } from 'utils/helpers'
@@ -15,7 +15,7 @@ listRouter.delete(
   param('taxonomyId').not().isEmpty().trim().isLength({ min: 3 }),
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(routes.removeItemsCtrl)
+  asyncFn(controllers.removeItemsCtrl)
 )
 
 //!Delete list by Name
@@ -23,7 +23,7 @@ listRouter.delete(
   '/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(routes.deleteListCtrl)
+  asyncFn(controllers.deleteListCtrl)
 )
 
 /**
@@ -34,11 +34,11 @@ listRouter.post(
   '/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(routes.createListCtrl)
+  asyncFn(controllers.createListCtrl)
 )
 
 //POST all list- no pagination is need, because can have only 10 to 20 lists in total
-listRouter.post('/', verifyUser, asyncFn(routes.getListCtrl))
+listRouter.post('/', verifyUser, asyncFn(controllers.getListCtrl))
 
 // *Add new Taxonomy to the list
 listRouter.post(
@@ -51,7 +51,7 @@ listRouter.post(
     min: 3,
   }),
   verifyUser,
-  asyncFn(routes.addListItemCtrl)
+  asyncFn(controllers.addListItemCtrl)
 )
 // *remove new Taxonomy to the list
 listRouter.delete(
@@ -64,20 +64,24 @@ listRouter.delete(
     min: 3,
   }),
   verifyUser,
-  asyncFn(routes.removeListItemCtrl)
+  asyncFn(controllers.removeListItemCtrl)
 )
 
 /**
  * GET
  */
 //Send specific list with items
-listRouter.get('/list/:listName', verifyUser, asyncFn(routes.getListItemsCtrl))
+listRouter.get(
+  '/list/:listName',
+  verifyUser,
+  asyncFn(controllers.getListItemsCtrl)
+)
 
 //?get specific list with items
 listRouter.get(
   '/list/:listName/:id',
   verifyUser,
-  asyncFn(routes.getListItemByIdCtrl)
+  asyncFn(controllers.getListItemByIdCtrl)
 )
 
 //get Total list
@@ -85,7 +89,7 @@ listRouter.get(
   '/list/total-items/:listName',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(routes.getTotalItemsCtrl)
+  asyncFn(controllers.getTotalItemsCtrl)
 )
 
 //get list by ID
@@ -93,7 +97,7 @@ listRouter.get(
   '/list/:listId',
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(routes.getTotalItemsCtrl)
+  asyncFn(controllers.getTotalItemsCtrl)
 )
 
 //get All ids of birds from any list
@@ -101,7 +105,7 @@ listRouter.post(
   '/birds/:username',
   param('username').not().isEmpty().trim(),
   verifyUser,
-  asyncFn(routes.getUsersBirdIdsCtrl)
+  asyncFn(controllers.getUsersBirdIdsCtrl)
 )
 //edit list
 listRouter.put(
@@ -109,5 +113,5 @@ listRouter.put(
   param('slug').not().isEmpty().trim(),
 
   verifyUser,
-  asyncFn(routes.updateListByIDCtrl)
+  asyncFn(controllers.updateListByIDCtrl)
 )
