@@ -224,6 +224,7 @@ export async function getNames(): Promise<ITaxonomy[] | null> {
       .project({
         englishName: 1,
         taxonomyName: 1,
+        username: 1,
       })
 
     return isTaxonomy.toArray()
@@ -269,6 +270,7 @@ export async function getByRank({
         englishName: 1,
         parent: 1,
         ancestors: 1,
+        username: 1,
       })
       .sort({ taxonomyName: 1 })
     return (await ts.toArray()) as ITaxonomy[]

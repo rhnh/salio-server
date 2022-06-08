@@ -21,6 +21,7 @@ export interface ITaxonomy extends IBaseModel {
   info?: string
   sex?: IGender | undefined
   ancestors?: string[]
+  credit?: string
 }
 
 export function isRank(rank: IRank): rank is IRank {

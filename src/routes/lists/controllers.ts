@@ -46,43 +46,6 @@ export async function createListCtrl(
     })
   }
 }
-//Delete specific list
-export async function deleteListCtrl(
-  req: Request,
-  res: Response
-): Promise<Response | void> {
-  try {
-    const { listName } = req.params
-    const { username } = req.user as IUser
-
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-      return res.status(httpStatus.badRequest).json({ errors: errors.array() })
-    }
-    if (listName === '' || !listName) {
-      return res
-        .status(httpStatus.badRequest)
-        .json({ message: 'Something went wrong', done: true })
-    }
-    const isDeleted = await ListModel.deleteUserListName({ username, listName })
-    if (isDeleted) {
-      return res.json({
-        message: `Successfully deleted ListName: "${listName}"`,
-        done: true,
-        user: req.user,
-      })
-    }
-    return res.status(httpStatus.error).json({
-      message: `Something went wrong,No ListName: "${listName}" found`,
-      done: false,
-    })
-  } catch (error) {
-    return res.json({
-      status: httpStatus.badRequest,
-      done: false,
-    })
-  }
-}
 
 //Get all user's lists
 export async function getListCtrl(
@@ -167,8 +130,7 @@ export async function updateListByIDCtrl(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const { username } = req.user as IUser
-  const { slug } = req.params
+  const { listId } = req.params
   const { newListName } = req.body
 
   if (newListName === '') {
@@ -178,9 +140,8 @@ export async function updateListByIDCtrl(
     })
   }
   try {
-    const hasUpdated = await ListModel.hasUpdateList({
-      slug,
-      username,
+    const hasUpdated = await ListModel.updateById({
+      listId,
       newListName,
     })
     if (hasUpdated) {
@@ -271,53 +232,7 @@ export async function addListItemCtrl(
     })
   }
 }
-//Add specific Specific Taxonomy to user list
-export async function removeListItemCtrl(
-  req: Request,
-  res: Response
-): Promise<Response> {
-  const { username } = req.user as IUser
-  const { englishName, taxonomy, location } = req.body
-  const { listName } = req.params
-  if (englishName === '' || taxonomy === '') {
-    res.status(409)
-    return res.json({
-      message: httpStatus.badRequest,
-    })
-  }
-  try {
-    const isTaxonomy = await getByApprovedSpecies(englishName, taxonomy)
 
-    const { _id } = ((await isTaxonomy) as ITaxonomy) || ''
-    if (_id) {
-      const done = await ListModel.deleteListItem({
-        username,
-        listName,
-        taxonomyId: _id,
-        location,
-      })
-      if (done) {
-        return res.json({
-          done: true,
-          message: 'successfully added',
-        })
-      } else {
-        return res.status(404).json({
-          done: false,
-          message: 'Something went wrong',
-        })
-      }
-    }
-    return res.status(404).json({})
-  } catch (error) {
-    const err = error as Error
-    return res.status(500).json({
-      done: false,
-      error: true,
-      message: err.message,
-    })
-  }
-}
 //Get all items for specific username and listName
 export async function getListItemsCtrl(
   req: Request,
@@ -431,6 +346,77 @@ export async function getUsersBirdIdsCtrl(
       done: false,
       error: true,
       message: err.message,
+    })
+  }
+}
+
+//Delete specific list by name
+export async function deleteListCtrl(
+  req: Request,
+  res: Response
+): Promise<Response | void> {
+  try {
+    const { listName } = req.params
+    const { username } = req.user as IUser
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(httpStatus.badRequest).json({ errors: errors.array() })
+    }
+    if (listName === '' || !listName) {
+      return res
+        .status(httpStatus.badRequest)
+        .json({ message: 'Something went wrong', done: true })
+    }
+    const isDeleted = await ListModel.deleteUserListName({ username, listName })
+    if (isDeleted) {
+      return res.json({
+        message: `Successfully deleted ListName: "${listName}"`,
+        done: true,
+        user: req.user,
+      })
+    }
+    return res.status(httpStatus.error).json({
+      message: `Something went wrong,No ListName: "${listName}" found`,
+      done: false,
+    })
+  } catch (error) {
+    return res.json({
+      status: httpStatus.badRequest,
+      done: false,
+    })
+  }
+}
+
+//Delete specific list by name
+export async function deleteListByIDCtrl(
+  req: Request,
+  res: Response
+): Promise<Response | void> {
+  try {
+    const { listId } = req.params
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(httpStatus.badRequest).json({ errors: errors.array() })
+    }
+
+    const isDeleted = await ListModel.deleteById(listId || '')
+    if (isDeleted) {
+      return res.json({
+        message: `Successfully deleted `,
+        done: true,
+        user: req.user,
+      })
+    }
+    return res.status(httpStatus.error).json({
+      message: `Something went wrong,No ListName: found`,
+      done: false,
+    })
+  } catch (error) {
+    return res.json({
+      status: httpStatus.badRequest,
+      done: false,
     })
   }
 }

@@ -96,7 +96,7 @@ export async function getTotalItems({
 export async function getListItems(param: IList): Promise<Cursor> {
   const { username, listName } = param
   try {
-    const listItems = await lists?.aggregate([
+    const listItems = lists?.aggregate([
       {
         $match: {
           username,
@@ -119,18 +119,16 @@ export async function getListItems(param: IList): Promise<Cursor> {
   }
 }
 
-export async function hasUpdateList({
-  slug,
-  username,
+export async function updateById({
+  listId,
   newListName,
 }: {
-  slug: string
-  username: string
+  listId: string
   newListName: string
 }): Promise<boolean> {
   try {
     const hasUpdatedList = await lists.updateOne(
-      { username, slug },
+      { _id: new ObjectId(listId) },
       {
         $set: {
           listName: newListName,
@@ -164,6 +162,7 @@ export async function purgeUserList(username: string): Promise<boolean> {
     return false
   }
 }
+
 export async function getListsByUsername({
   username,
 }: {
@@ -305,5 +304,13 @@ export async function getUsersBirdIds(username: string): Promise<string[]> {
     return result
   } catch (error) {
     return []
+  }
+}
+
+export async function deleteById(listId: string): Promise<boolean> {
+  try {
+    return (await lists.deleteOne({ _id: listId })).result.n === 1
+  } catch (error) {
+    return false
   }
 }
