@@ -309,7 +309,7 @@ export async function getUsersBirdIds(username: string): Promise<string[]> {
 
 export async function deleteById(listId: string): Promise<boolean> {
   try {
-    return (await lists.deleteOne({ _id: listId })).result.n === 1
+    return (await lists.deleteOne({ _id: new ObjectId(listId) })).result.n === 1
   } catch (error) {
     return false
   }
