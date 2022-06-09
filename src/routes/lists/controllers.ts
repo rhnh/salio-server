@@ -184,7 +184,7 @@ export async function addListItemCtrl(
       taxonomyName
     )
 
-    const { _id } = ((await isApprovedTaxonomy) as ITaxonomy) || ''
+    const { _id } = (isApprovedTaxonomy as ITaxonomy) || ''
     if (_id) {
       const done = await ListModel.createListItem({
         username,

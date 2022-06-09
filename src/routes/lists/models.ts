@@ -100,7 +100,7 @@ export async function getListItems(param: IList): Promise<Cursor> {
       {
         $match: {
           username,
-          listName,
+          slug: slugify(listName),
         },
       },
       {
