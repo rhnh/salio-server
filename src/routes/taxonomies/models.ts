@@ -114,6 +114,22 @@ export async function getByUser({
     return []
   }
 }
+export async function getByParent({
+  parent,
+}: {
+  parent: string
+}): Promise<ITaxonomy[] | []> {
+  try {
+    const birds = await taxonomies.find({
+      parent,
+      isApproved: true,
+    })
+    return await birds.toArray()
+  } catch (error) {
+    console.error('something went wrong', getByUser.name, error)
+    return []
+  }
+}
 
 export async function getByTaxonomyName(
   taxonomyName: string
@@ -264,7 +280,7 @@ export async function getByRank({
   try {
     const r = new RegExp(rank, 'i')
     const ts = taxonomies
-      .find({ rank: r, isApproved: true, englishName: { $ne: null } })
+      .find({ rank: r, isApproved: true })
       .project({
         taxonomyName: 1,
         englishName: 1,

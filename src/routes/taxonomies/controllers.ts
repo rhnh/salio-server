@@ -20,7 +20,7 @@ export async function createCTRL(
     const { username } = req.user as IUser
 
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const event: Date = new Date()
     const today = event.setDate(event.getDate() + 1)
@@ -54,7 +54,7 @@ export async function updateCTRL(
 ): Promise<Response> {
   const { username } = req.user as IUser
   if (!username) {
-    return res.status(404).json({ done: 'you are logged in!' })
+    return res.status(404).json({ done: 'you are not logged in!' })
   }
   try {
     const {
@@ -108,7 +108,7 @@ export async function getCtr(req: Request, res: Response): Promise<Response> {
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -133,7 +133,7 @@ export async function getSpeciesCtr(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -157,7 +157,7 @@ export async function getByIdCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -183,7 +183,7 @@ export async function getByTaxonomyNameCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -209,7 +209,7 @@ export async function getByEnglishNameCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const names = await modal.getNames()
     return res.json(names)
@@ -217,6 +217,7 @@ export async function getByEnglishNameCtrl(
     throw new Error(getByEnglishNameCtrl.name)
   }
 }
+
 export async function setApprovedCtrl(
   req: Request,
   res: Response
@@ -224,7 +225,7 @@ export async function setApprovedCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const id = req.params?.id || ''
     const names = await modal.setApprove(id)
@@ -241,7 +242,7 @@ export async function getPaginatedCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const limit: number = ((req.query?.limit as unknown) as number) || 10
     const page: number = (req.query.page as unknown) as number
@@ -274,7 +275,7 @@ export async function getByRankCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const rank = (req.params?.rank as IRank) || ''
     if (!isRank(rank)) {
@@ -289,6 +290,29 @@ export async function getByRankCtrl(
     })
   }
 }
+export async function getByParentCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { username } = req.user as IUser
+    if (!username) {
+      return res.status(404).json({ done: 'you are not logged in!' })
+    }
+    const parent = (req.params?.parent as string) || ''
+    if (!parent) {
+      return res.status(400).json({ message: 'Invalid Rank', done: false })
+    }
+    const children = await modal.getByParent({ parent })
+    return res.json(children)
+  } catch (error) {
+    return res.json(500).json({
+      done: false,
+      message: `Something went wrong ${getPaginatedCtrl.name}`,
+    })
+  }
+}
+
 export async function getByAncestorsCtrl(
   req: Request,
   res: Response
@@ -296,7 +320,7 @@ export async function getByAncestorsCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const parent = req.params?.parent || ''
     const rank = req.params?.rank || ''
@@ -317,7 +341,7 @@ export async function getUnApprovedCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
 
     const unapproved = await modal.getUnApproved()
@@ -336,7 +360,7 @@ export async function delTaxByIdCtrl(
   try {
     const { username } = req.user as IUser
     if (!username) {
-      return res.status(404).json({ done: 'you are logged in!' })
+      return res.status(404).json({ done: 'you are not logged in!' })
     }
     const id = req.params?.id || ''
     const names = await modal.delTaxById(id)

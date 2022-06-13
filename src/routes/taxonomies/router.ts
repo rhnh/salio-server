@@ -15,6 +15,7 @@ import {
   getUnApprovedCtrl,
   setApprovedCtrl,
   delTaxByIdCtrl,
+  getByParentCtrl,
 } from './controllers'
 
 export const taxonomyRouter = Router()
@@ -84,6 +85,9 @@ taxonomyRouter.get(
   verifyUser,
   asyncFn(getByAncestorsCtrl)
 )
+
+//get Children
+taxonomyRouter.get('/parent/:parent', verifyUser, asyncFn(getByParentCtrl))
 
 //get all unapproved taxonomies which are added only by mods/admin
 taxonomyRouter.get('/unapproved', verifyUser, asyncFn(getUnApprovedCtrl))
