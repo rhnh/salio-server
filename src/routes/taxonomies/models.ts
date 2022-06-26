@@ -47,25 +47,31 @@ export async function create(
   }
 }
 
-export async function update(
-  taxonomy: ITaxonomy,
+export async function update({
+  id,
+  uTaxonomy,
+}: {
+  id: string
   uTaxonomy: ITaxonomy
-): Promise<ISalioResponse<string>> {
+}): Promise<ISalioResponse<string>> {
   try {
     const hasItem = await taxonomies.updateOne(
       {
-        taxonomy,
+        _id: new ObjectId(id),
       },
       {
-        set: {
-          uTaxonomy,
+        $set: {
+          taxonomyName: uTaxonomy.taxonomyName,
+          englishName: uTaxonomy.englishName,
+          parent: uTaxonomy.parent,
+          rank: uTaxonomy.rank,
+          info: uTaxonomy.info,
         },
       }
     )
     if (hasItem.result.n === 1) {
       return {
         done: true,
-        data: [hasItem.upsertedId.toString()],
       }
     }
     return {
@@ -120,8 +126,10 @@ export async function getByParent({
   parent: string
 }): Promise<ITaxonomy[] | []> {
   try {
-    const birds = await taxonomies.find({
-      parent,
+    const t = new RegExp(parent, 'i')
+
+    const birds = taxonomies.find({
+      parent: t,
       isApproved: true,
     })
     return await birds.toArray()
@@ -287,6 +295,7 @@ export async function getByRank({
         parent: 1,
         ancestors: 1,
         username: 1,
+        info: 1,
       })
       .sort({ taxonomyName: 1 })
     return (await ts.toArray()) as ITaxonomy[]

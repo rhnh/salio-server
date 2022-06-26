@@ -18,7 +18,6 @@ export async function createCTRL(
 ): Promise<Response> {
   try {
     const { username } = req.user as IUser
-
     if (!username) {
       return res.status(404).json({ done: 'you are not logged in!' })
     }
@@ -26,13 +25,11 @@ export async function createCTRL(
     const today = event.setDate(event.getDate() + 1)
     const t = req.body as ITaxonomy
     const errors = validationResult(req)
-
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
     }
 
     const taxonomy = { ...t, createdAt: today }
-
     const hasItem = await modal.create(taxonomy)
 
     if (hasItem.done) {
@@ -57,39 +54,28 @@ export async function updateCTRL(
     return res.status(404).json({ done: 'you are not logged in!' })
   }
   try {
-    const {
-      englishName,
-      category,
-      taxonomy,
-      uTaxonomy,
-      englishName_new,
-      uCategory,
-    } = req.body
+    const { englishName, taxonomyName, info, parent, rank } = req.body
+    const { id } = req.params
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })
     }
     const { username } = req.user as IUser
-    const t1: ITaxonomy = {
-      englishName,
-      rank: category,
+    const taxonomy: ITaxonomy = {
+      englishName: englishName ?? '',
+      taxonomyName: taxonomyName ?? '',
+      info: info ?? '',
+      parent: parent ?? '',
       username,
-      taxonomyName: taxonomy,
       isApproved: false,
+      rank: rank ?? 'species',
     }
 
-    const ut1: ITaxonomy = {
-      englishName: englishName_new,
-      rank: uCategory,
-      isApproved: false,
-      username,
-      taxonomyName: uTaxonomy,
-    }
-    const hasItem = await modal.update(t1, ut1)
+    const hasItem = await modal.update({ id, uTaxonomy: taxonomy })
     if (hasItem.done) {
       return res.status(httpStatus.ok).json({
         done: true,
-        message: `${t1} has been added!`,
+        message: `${taxonomyName} has been added!`,
         birdId: hasItem.data,
       })
     }
@@ -250,6 +236,7 @@ export async function getPaginatedCtrl(
       page: Number(page),
       limit: Number(limit),
     })
+
     const r = { ...ts }
     return res.status(200).json({
       page: r.page,
@@ -301,7 +288,9 @@ export async function getByParentCtrl(
     }
     const parent = (req.params?.parent as string) || ''
     if (!parent) {
-      return res.status(400).json({ message: 'Invalid Rank', done: false })
+      return res
+        .status(400)
+        .json({ message: 'Invalid Parent name', done: false })
     }
     const children = await modal.getByParent({ parent })
     return res.json(children)

@@ -16,6 +16,7 @@ import {
   setApprovedCtrl,
   delTaxByIdCtrl,
   getByParentCtrl,
+  updateCTRL,
 } from './controllers'
 
 export const taxonomyRouter = Router()
@@ -35,7 +36,7 @@ export const taxonomyRouter = Router()
  */
 taxonomyRouter.post(
   '/',
-  body('ancestors').isArray().notEmpty(),
+  body('ancestors').isArray(),
   body('rank').notEmpty().trim(),
   body('taxonomyName').notEmpty().trim(),
   verifyUser,
@@ -105,4 +106,12 @@ taxonomyRouter.delete(
   param('id').notEmpty().trim(),
   verifyUser,
   asyncFn(delTaxByIdCtrl)
+)
+
+taxonomyRouter.put(
+  '/taxonomy/:id',
+  body('taxonomyName').notEmpty().trim(),
+  param('id').notEmpty().trim(),
+  verifyUser,
+  asyncFn(updateCTRL)
 )

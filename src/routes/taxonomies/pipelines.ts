@@ -1,7 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const paginationPipeLine = (page = 1) => {
-  const limit = 4
-  const skip = (Math.ceil(page) - 1) * limit
+export const paginationPipeLine = (pageNumber = 1) => {
+  const limit = 5
+  const cal = (Number(pageNumber) - 1) * limit
+  const skip = cal < 0 ? 0 : cal
+  if (pageNumber <= 0) {
+    pageNumber = 1
+  }
+  console.log(
+    `limit ${limit} skip ${skip} page ${pageNumber} this shit ${Number(
+      pageNumber
+    )}`
+  )
 
   return [
     {
@@ -11,6 +20,13 @@ export const paginationPipeLine = (page = 1) => {
         rank: /species/i,
       },
     },
+    {
+      $project: {
+        ancestors: 0,
+        parent: 0,
+      },
+    },
+
     {
       $sort: {
         taxonomyName: -1,
@@ -33,6 +49,7 @@ export const paginationPipeLine = (page = 1) => {
         ],
       },
     },
+
     {
       $unwind: '$total',
     },
@@ -52,13 +69,13 @@ export const paginationPipeLine = (page = 1) => {
           $literal: skip / limit + 1,
         },
         hasNextPage: {
-          $lt: [{ $multiply: [limit, Math.ceil(page)] }, '$total.count'],
+          $lt: [{ $multiply: [limit, Number(pageNumber)] }, '$total.count'],
         },
         hasPreviousPage: {
           $cond: [
-            { $eq: [Math.ceil(page), 0] },
+            { $eq: [Number(pageNumber), 1] }, //if current pageName is equal to the fist, then return false
             false,
-            { $gt: [Math.ceil(page), Math.ceil(page) - 1] },
+            { $gt: [Number(pageNumber), Number(pageNumber) - 1] }, //else return current pageNumber is greater than previous page.
           ],
         },
         totalPages: {
