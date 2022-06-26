@@ -154,6 +154,23 @@ export async function deleteUserListName({
     return false
   }
 }
+export async function deleteListById({
+  listId,
+  username,
+}: {
+  listId: string
+  username: string
+}): Promise<boolean> {
+  try {
+    const hasDeletedList = await lists.deleteOne({
+      _id: new ObjectId(listId),
+      username,
+    })
+    return hasDeletedList.result.n === 1
+  } catch (error) {
+    return false
+  }
+}
 export async function purgeUserList(username: string): Promise<boolean> {
   try {
     const hasDeleteAll = await lists.deleteMany({ username })

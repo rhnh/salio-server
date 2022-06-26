@@ -105,10 +105,10 @@ listRouter.delete(
 
 //!Delete list by Name
 listRouter.delete(
-  '/list/:listName',
-  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
+  '/list/:listId',
+  param('listId').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
-  asyncFn(controllers.deleteListCtrl)
+  asyncFn(controllers.deleteListIDCtrl)
 )
 
 //delete list by ID

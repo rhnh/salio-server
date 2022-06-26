@@ -351,33 +351,33 @@ export async function getUsersBirdIdsCtrl(
 }
 
 //Delete specific list by name
-export async function deleteListCtrl(
+export async function deleteListIDCtrl(
   req: Request,
   res: Response
 ): Promise<Response | void> {
   try {
-    const { listName } = req.params
+    const { listId } = req.params
     const { username } = req.user as IUser
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(httpStatus.badRequest).json({ errors: errors.array() })
     }
-    if (listName === '' || !listName) {
+    if (listId === '' || !listId) {
       return res
         .status(httpStatus.badRequest)
         .json({ message: 'Something went wrong', done: true })
     }
-    const isDeleted = await ListModel.deleteUserListName({ username, listName })
+    const isDeleted = await ListModel.deleteListById({ listId, username })
     if (isDeleted) {
       return res.json({
-        message: `Successfully deleted ListName: "${listName}"`,
+        message: `Successfully deleted ListName: `,
         done: true,
         user: req.user,
       })
     }
     return res.status(httpStatus.error).json({
-      message: `Something went wrong,No ListName: "${listName}" found`,
+      message: `Something went wrong. ${deleteListIDCtrl.name}`,
       done: false,
     })
   } catch (error) {
