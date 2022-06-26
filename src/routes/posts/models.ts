@@ -52,6 +52,29 @@ export async function getPostById(id: string): Promise<ISalioResponse<string>> {
     }
   }
 }
+export async function deletePostById(
+  id: string
+): Promise<ISalioResponse<string>> {
+  try {
+    const foundPost = await postsCollection.deleteMany({
+      _id: new ObjectId(id),
+    })
+    if (foundPost) {
+      return { done: true, ...foundPost }
+    }
+    return {
+      done: false,
+      data: null,
+      message: 'no Post found',
+    }
+  } catch (error) {
+    return {
+      done: false,
+      data: null,
+      message: 'error',
+    }
+  }
+}
 export async function getFeaturedPost(): Promise<IPost[] | null> {
   try {
     const foundPosts = await postsCollection.find({

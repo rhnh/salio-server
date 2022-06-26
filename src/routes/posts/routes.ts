@@ -11,6 +11,7 @@ import {
   setFeaturedPostCtrl,
   getPostsCtrl,
   unFeaturedPostCtrl,
+  deletePostByCtrl,
 } from '.'
 
 export const postRouter = Router()
@@ -34,3 +35,6 @@ postRouter.get('/featured', asyncFn(getFeaturedPostCtrl))
 
 postRouter.put('/featured/:id', verifyUser, asyncFn(setFeaturedPostCtrl))
 postRouter.put('/unfeatured/:id', verifyUser, asyncFn(unFeaturedPostCtrl))
+
+//get post by id
+postRouter.delete('/post/:id', asyncFn(deletePostByCtrl))

@@ -2,9 +2,10 @@
 
 import { Response, Request } from 'express'
 // import { findUserByUsername } from '../models/user-models'
-import { IPost } from 'types'
+import { httpStatus, IPost } from 'types'
 import {
   createPost,
+  deletePostById,
   getFeaturedPost,
   getPostById,
   getPosts,
@@ -113,6 +114,22 @@ export async function unFeaturedPostCtrl(
     const { id } = req.params
     const isIt = await unFeaturedPost(id)
     return res.json(isIt)
+  } catch (error) {
+    throw new Error('Cannot get posts. Something went wrong on server')
+  }
+}
+export async function deletePostByCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    const { id } = req.params
+    const isIt = await deletePostById(id)
+    if (isIt) {
+      return res.status(200).json({ done: true })
+    } else {
+      return res.status(httpStatus.badRequest)
+    }
   } catch (error) {
     throw new Error('Cannot get posts. Something went wrong on server')
   }
