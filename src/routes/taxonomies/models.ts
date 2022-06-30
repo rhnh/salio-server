@@ -159,8 +159,7 @@ export async function getByTaxonomyName(
 
 export async function addSpecies(
   englishName: string,
-  taxonomyName: string,
-  location: string
+  taxonomyName: string
 ): Promise<string> {
   try {
     const slug = slugify(englishName)
@@ -168,14 +167,22 @@ export async function addSpecies(
       taxonomyName,
       englishName,
       rank: 'species',
-      location,
       slug,
+      createAt: Date.now(),
     })
     return isTaxonomy.insertedId
   } catch (error) {
     console.error('error', addSpecies.name)
     return ''
   }
+}
+
+export async function removeUnApprove(id: string): Promise<boolean> {
+  const hasRemoved = taxonomies.deleteOne({
+    _id: new ObjectId(id),
+    isApproved: { $ne: true },
+  })
+  return (await hasRemoved).deletedCount === 1
 }
 
 export async function get(): Promise<ITaxonomy[]> {
@@ -227,10 +234,12 @@ export async function getByApprovedSpecies(
   englishName: string,
   taxonomyName: string
 ): Promise<ITaxonomy | null> {
+  const t = new RegExp(taxonomyName, 'i')
+  const e = new RegExp(englishName, 'i')
   try {
     const isTaxonomy = await taxonomies.findOne({
-      englishName,
-      taxonomyName,
+      englishName: e,
+      taxonomyName: t,
       isApproved: true,
     })
     return isTaxonomy

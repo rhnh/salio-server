@@ -6,11 +6,6 @@ export const paginationPipeLine = (pageNumber = 1) => {
   if (pageNumber <= 0) {
     pageNumber = 1
   }
-  console.log(
-    `limit ${limit} skip ${skip} page ${pageNumber} this shit ${Number(
-      pageNumber
-    )}`
-  )
 
   return [
     {

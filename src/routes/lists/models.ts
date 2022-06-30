@@ -104,15 +104,63 @@ export async function getListItems(param: IList): Promise<Cursor> {
         },
       },
       {
+        $unwind: {
+          path: '$birds',
+        },
+      },
+      {
+        $sort: {
+          'birds.seen': 1,
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ['$$ROOT', '$birds'],
+          },
+        },
+      },
+      {
+        $project: {
+          birds: 0,
+        },
+      },
+      {
         $lookup: {
           from: 'taxonomies',
-          localField: 'birds.birdId',
-          foreignField: '_id',
+          let: {
+            item: '$birdId',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$$item', '$_id'],
+                },
+              },
+            },
+          ],
           as: 'birds',
         },
       },
+      {
+        $unwind: {
+          path: '$birds',
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ['$birds', '$$ROOT'],
+          },
+        },
+      },
+      {
+        $project: {
+          birds: 0,
+        },
+      },
     ])
-
     return listItems
   } catch (error) {
     throw new Error(getListItems.name + ' has error')
@@ -142,6 +190,31 @@ export async function updateById({
     return false
   }
 }
+export async function updateBySlug({
+  listName,
+  newListName,
+  username,
+}: {
+  listName: string
+  newListName: string
+  username: string
+}): Promise<boolean> {
+  try {
+    const hasUpdatedList = await lists.updateOne(
+      { slug: slugify(listName), username },
+      {
+        $set: {
+          listName: newListName,
+          slug: slugify(newListName),
+        },
+      }
+    )
+
+    return hasUpdatedList.result.n === 1
+  } catch (error) {
+    return false
+  }
+}
 
 export async function deleteUserListName({
   listName,
@@ -155,15 +228,15 @@ export async function deleteUserListName({
   }
 }
 export async function deleteListById({
-  listId,
+  listName,
   username,
 }: {
-  listId: string
+  listName: string
   username: string
 }): Promise<boolean> {
   try {
     const hasDeletedList = await lists.deleteOne({
-      _id: new ObjectId(listId),
+      slug: slugify(listName),
       username,
     })
     return hasDeletedList.result.n === 1
@@ -211,9 +284,11 @@ interface IParam {
   listName: string
   username: string
   location?: string
+  seen?: string
 }
 export async function createListItem(param: IParam): Promise<boolean> {
   const { username, listName, taxonomyId, location } = param
+  const id = new ObjectId(taxonomyId)
   try {
     if (!taxonomyId) {
       return false
@@ -224,9 +299,9 @@ export async function createListItem(param: IParam): Promise<boolean> {
       {
         $push: {
           birds: {
-            birdId: new ObjectId(taxonomyId),
+            birdId: id,
             location,
-            createdAt: Date.now(),
+            seen: Date.now(),
           },
         },
       }
@@ -241,7 +316,7 @@ export async function createListItem(param: IParam): Promise<boolean> {
 }
 
 export async function deleteListItem(param: IParam): Promise<boolean> {
-  const { username, listName, taxonomyId } = param
+  const { username, listName, taxonomyId, seen } = param
   try {
     if (!taxonomyId) {
       return false
@@ -253,11 +328,12 @@ export async function deleteListItem(param: IParam): Promise<boolean> {
         $pull: {
           birds: {
             birdId: new ObjectId(taxonomyId),
+            seen: Number(seen),
           },
         },
       }
     )
-    if (isAdd.matchedCount === 1) {
+    if (isAdd.modifiedCount === 1) {
       return true
     }
     return false
@@ -267,7 +343,7 @@ export async function deleteListItem(param: IParam): Promise<boolean> {
 }
 
 export async function removeListItem(param: IParam): Promise<boolean> {
-  const { username, listName, taxonomyId } = param
+  const { username, listName, taxonomyId, seen } = param
   try {
     if (!taxonomyId) {
       return false
@@ -278,11 +354,27 @@ export async function removeListItem(param: IParam): Promise<boolean> {
         $pull: {
           birds: {
             birdId: new ObjectId(taxonomyId),
+            seen: Number(seen),
           },
         },
       }
     )
-    return hasRemoved.result.ok === 1
+    return hasRemoved.modifiedCount === 1
+  } catch (error) {
+    return false
+  }
+}
+export async function updateListItem(param: IParam): Promise<boolean> {
+  const { taxonomyId } = param
+  try {
+    if (!taxonomyId) {
+      return false
+    }
+    return false
+    // //find is if is not approved taxonomy.
+    // const isApproved = await lists.findOne({
+    //   taxonomy
+    // })
   } catch (error) {
     return false
   }

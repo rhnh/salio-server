@@ -1,7 +1,11 @@
 import { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import * as ListModel from './models'
-import { addSpecies, getByApprovedSpecies } from 'routes/taxonomies/models'
+import {
+  addSpecies,
+  getByApprovedSpecies,
+  removeUnApprove,
+} from 'routes/taxonomies/models'
 import { httpStatus, ITaxonomy, IUser } from 'types'
 
 //Create a new list
@@ -130,8 +134,9 @@ export async function updateListByIDCtrl(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const { listId } = req.params
+  const { listName } = req.params
   const { newListName } = req.body
+  const { username } = req.user as IUser
 
   if (newListName === '') {
     return res.status(400).json({
@@ -140,9 +145,10 @@ export async function updateListByIDCtrl(
     })
   }
   try {
-    const hasUpdated = await ListModel.updateById({
-      listId,
+    const hasUpdated = await ListModel.updateBySlug({
+      listName,
       newListName,
+      username,
     })
     if (hasUpdated) {
       return res.status(httpStatus.ok).json({
@@ -179,6 +185,7 @@ export async function addListItemCtrl(
     })
   }
   try {
+    //Search if there is an Approved Taxonomy
     const isApprovedTaxonomy = await getByApprovedSpecies(
       englishName,
       taxonomyName
@@ -192,6 +199,7 @@ export async function addListItemCtrl(
         taxonomyId: _id,
         location,
       })
+
       if (done) {
         return res.json({
           done: true,
@@ -204,7 +212,8 @@ export async function addListItemCtrl(
         })
       }
     }
-    const taxonomyId = await addSpecies(englishName, taxonomyName, location)
+
+    const taxonomyId = await addSpecies(englishName, taxonomyName)
 
     const done = await ListModel.createListItem({
       username,
@@ -247,8 +256,7 @@ export async function getListItemsCtrl(
     })
 
     const result = await birds.toArray()
-
-    return res.json(...result)
+    return res.json(result)
   } catch (error) {
     const err = error as Error
     return res.status(500).json({
@@ -272,7 +280,7 @@ export async function getListItemByIdCtrl(
       username,
     })
 
-    const result = await await birds.toArray()
+    const result = await birds.toArray()
     const bird = result.find((bird) => {
       return bird._id.toString() === id
     })
@@ -313,9 +321,41 @@ export async function removeItemsCtrl(
 ): Promise<Response> {
   const { username } = req.user as IUser
 
+  const { listName, taxonomyId, seen } = req.params
+  try {
+    try {
+      await removeUnApprove(taxonomyId)
+    } catch (error) {
+      return res.json(httpStatus.badRequest).json({ done: false })
+    }
+    const done = await ListModel.removeListItem({
+      listName,
+      username,
+      taxonomyId,
+      seen,
+    })
+    if (done) {
+      return res.json({ done, message: 'successfully delete it' })
+    }
+    return res.status(404).json({ done, message: 'failed' })
+  } catch (error) {
+    const err = error as Error
+    return res.status(500).json({
+      done: false,
+      error: true,
+      message: err.message,
+    })
+  }
+}
+export async function updateItemsCtrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { username } = req.user as IUser
+
   const { listName, taxonomyId } = req.params
   try {
-    const done = await ListModel.removeListItem({
+    const done = await ListModel.updateListItem({
       listName,
       username,
       taxonomyId,
@@ -356,19 +396,19 @@ export async function deleteListIDCtrl(
   res: Response
 ): Promise<Response | void> {
   try {
-    const { listId } = req.params
+    const { listName } = req.params
     const { username } = req.user as IUser
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(httpStatus.badRequest).json({ errors: errors.array() })
     }
-    if (listId === '' || !listId) {
+    if (listName === '' || !listName) {
       return res
         .status(httpStatus.badRequest)
         .json({ message: 'Something went wrong', done: true })
     }
-    const isDeleted = await ListModel.deleteListById({ listId, username })
+    const isDeleted = await ListModel.deleteListById({ listName, username })
     if (isDeleted) {
       return res.json({
         message: `Successfully deleted ListName: `,

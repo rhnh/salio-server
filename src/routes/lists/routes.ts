@@ -84,19 +84,27 @@ listRouter.get(
  */
 //edit list
 listRouter.put(
-  '/list/:listId',
-  param(`listId`).not().isEmpty().trim(),
+  '/list/:listName/',
+  param(`listName`).not().isEmpty().trim(),
   verifyUser,
   asyncFn(controllers.updateListByIDCtrl)
 )
 
+//edit items
+listRouter.put(
+  `/list/:listName/bird/:taxonomyId`,
+  param(`taxonomyId`).not().isEmpty().trim().isLength({ min: 3 }),
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
+  verifyUser,
+  asyncFn(controllers.removeItemsCtrl)
+)
 /**
  * DELETE
  * #################################################################################
  */
-//!Delete by Id
+//!Delete item by Id
 listRouter.delete(
-  `/list/:listName/bird/:taxonomyId`,
+  `/list/:listName/bird/:taxonomyId/:seen`,
   param(`taxonomyId`).not().isEmpty().trim().isLength({ min: 3 }),
   param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
@@ -105,8 +113,8 @@ listRouter.delete(
 
 //!Delete list by Name
 listRouter.delete(
-  '/list/:listId',
-  param('listId').not().isEmpty().trim().isLength({ min: 3 }),
+  '/list/:listName',
+  param('listName').not().isEmpty().trim().isLength({ min: 3 }),
   verifyUser,
   asyncFn(controllers.deleteListIDCtrl)
 )
