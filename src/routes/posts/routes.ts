@@ -17,12 +17,7 @@ import {
 export const postRouter = Router()
 
 //Create new Post
-postRouter.post(
-  '/',
-  // body(['title'], ['body']).not().isEmpty().trim(),
-  // verifyUser,
-  asyncFn(createPostCTRL)
-)
+postRouter.post('/', verifyUser, asyncFn(createPostCTRL))
 
 //get all posts
 postRouter.get('/', asyncFn(getPostsCtrl))

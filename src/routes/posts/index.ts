@@ -1,8 +1,9 @@
 // import { validationResult } from 'express-validator'
 
 import { Response, Request } from 'express'
+import { validationResult } from 'express-validator'
 // import { findUserByUsername } from '../models/user-models'
-import { httpStatus, IPost } from 'types'
+import { httpStatus, IPost, IUser } from 'types'
 import {
   createPost,
   deletePostById,
@@ -17,23 +18,24 @@ export async function createPostCTRL(
   req: Request,
   res: Response
 ): Promise<Response> {
-  // const { username } = req.user as IUser
   try {
+    const { username } = req.user as IUser
+    /**
+     * @todo: at some points allow only certain users group
+     */
     // const user = await findUserByUsername(username)
-    const uname = 'john'
 
-    const { title, body, image_url } = req.body
-    // const errors = validationResult(req)
-    // if (!errors.isEmpty()) {
-    //   return res.status(400).json({
-    //     errors: errors.array(),
-    //     message: 'You need to fill all fields',
-    //   })
-    // }
-
-    if (uname) {
+    const { title, body, image_url } = req.body.post
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+        message: 'You need to fill all fields',
+      })
+    }
+    if (username) {
       const post: IPost = {
-        username: uname,
+        username,
         title,
         image_url,
         body,

@@ -160,7 +160,7 @@ export async function unFeaturedPost(
 
 export async function getPosts(): Promise<IPost[]> {
   try {
-    const posts = await postsCollection.find({})
+    const posts = postsCollection.find({}).sort({ createdAt: -1 })
     return posts.toArray()
   } catch (error) {
     console.error('error', getPosts.name)

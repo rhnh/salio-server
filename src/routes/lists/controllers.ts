@@ -185,7 +185,6 @@ export async function addListItemCtrl(
     })
   }
   try {
-    //Search if there is an Approved Taxonomy
     const isApprovedTaxonomy = await getByApprovedSpecies(
       englishName,
       taxonomyName
