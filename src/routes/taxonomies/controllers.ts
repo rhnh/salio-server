@@ -117,10 +117,10 @@ export async function getSpeciesCtr(
   res: Response
 ): Promise<Response> {
   try {
-    const { username } = req.user as IUser
-    if (!username) {
-      return res.status(404).json({ done: 'you are not logged in!' })
-    }
+    // const { username } = req.user as IUser
+    // if (!username) {
+    //   return res.status(404).json({ done: 'you are not logged in!' })
+    // }
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() })

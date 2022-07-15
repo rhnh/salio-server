@@ -47,7 +47,8 @@ taxonomyRouter.post(
 taxonomyRouter.get('/', verifyUser, getCtr)
 
 //get only english name
-taxonomyRouter.get('/species', verifyUser, getSpeciesCtr)
+// taxonomyRouter.get('/species', verifyUser, getSpeciesCtr)
+taxonomyRouter.get('/species', getSpeciesCtr)
 
 //get by id
 taxonomyRouter.get(
