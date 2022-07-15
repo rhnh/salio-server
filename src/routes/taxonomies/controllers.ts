@@ -230,7 +230,6 @@ export async function getPaginatedCtrl(
     // if (!username) {
     //   return res.status(404).json({ done: 'you are not logged in!' })
     // }
-    console.log('It was here')
     const limit: number = ((req.query?.limit as unknown) as number) || 10
     const page: number = (req.query.page as unknown) as number
     const ts = await modal.paginatedTaxonomies({
