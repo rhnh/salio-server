@@ -47,8 +47,7 @@ taxonomyRouter.post(
 taxonomyRouter.get('/', verifyUser, getCtr)
 
 //get only english name
-// taxonomyRouter.get('/species', verifyUser, getSpeciesCtr)
-taxonomyRouter.get('/species', getSpeciesCtr)
+taxonomyRouter.get('/species', verifyUser, getSpeciesCtr)
 
 //get by id
 taxonomyRouter.get(
@@ -74,7 +73,7 @@ taxonomyRouter.get(
 //get paginated
 taxonomyRouter.get(
   '/paginated',
-  verifyUser,
+  // verifyUser, //for now
   query('page').notEmpty(),
   query('limit').trim(),
   asyncFn(getPaginatedCtrl)
