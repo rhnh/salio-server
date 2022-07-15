@@ -282,8 +282,8 @@ export async function paginatedTaxonomies({
 }): Promise<MYResult | null> {
   try {
     const ts = taxonomies.aggregate(paginationPipeLine(page))
-    const f = await ts.toArray()
-    return f[0] as MYResult
+    const result = await ts.toArray()
+    return result[0] as MYResult
   } catch (error) {
     return null
   }
@@ -305,6 +305,7 @@ export async function getByRank({
         ancestors: 1,
         username: 1,
         info: 1,
+        credit: 1,
       })
       .sort({ taxonomyName: 1 })
     return (await ts.toArray()) as ITaxonomy[]

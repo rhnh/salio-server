@@ -77,9 +77,11 @@ export async function deletePostById(
 }
 export async function getFeaturedPost(): Promise<IPost[] | null> {
   try {
-    const foundPosts = await postsCollection.find({
-      featured: true,
-    })
+    const foundPosts = postsCollection
+      .find({
+        featured: true,
+      })
+      .sort({ createdAt: -1 })
     return await foundPosts.toArray()
   } catch (error) {
     return null
