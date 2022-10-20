@@ -7,14 +7,14 @@ import { setPosts } from 'routes/posts/models'
 import { setTaxonomies } from 'routes/taxonomies/models'
 import { setNotifications } from 'routes/notifications/models'
 import { USERS, NOTIFICATIONS, LISTS, TAXONOMIES, POSTS } from 'utils/const'
-console.log(URI, PORT)
+
 const client = new MongoClient(URI)
 
 export async function server(app: Application): Promise<void> {
   try {
     await client.connect()
     await client.db(DB_NAME).command({ ping: 1 })
-    console.info('Connected Successfully to the server')
+
     try {
       const existingCollections = await client
         .db(DB_NAME)
