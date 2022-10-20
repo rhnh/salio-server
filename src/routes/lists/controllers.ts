@@ -280,7 +280,7 @@ export async function getListItemByIdCtrl(
     })
 
     const result = await birds.toArray()
-    const bird = result.find((bird) => {
+    const bird = result.find((bird: any) => {
       return bird._id.toString() === id
     })
     return res.json(bird)

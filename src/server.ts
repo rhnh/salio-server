@@ -7,8 +7,8 @@ import { setPosts } from 'routes/posts/models'
 import { setTaxonomies } from 'routes/taxonomies/models'
 import { setNotifications } from 'routes/notifications/models'
 import { USERS, NOTIFICATIONS, LISTS, TAXONOMIES, POSTS } from 'utils/const'
-
-const client = new MongoClient(URI, { useUnifiedTopology: true })
+console.log(URI, PORT)
+const client = new MongoClient(URI)
 
 export async function server(app: Application): Promise<void> {
   try {

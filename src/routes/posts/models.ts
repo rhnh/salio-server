@@ -7,15 +7,16 @@ export const setPosts = (t: Collection): void => {
 }
 export async function createPost(post: IPost): Promise<ISalioResponse<string>> {
   try {
-    const newPost = await postsCollection.insertOne({
+    const newPost = postsCollection.insertOne({
       ...post,
       createdAt: Date.now(),
+      _id: new ObjectId(),
     })
+    const result = await newPost
 
-    if (newPost.result.n === 1) {
+    if (result.insertedId) {
       return {
         done: true,
-        data: newPost.insertedId,
       }
     }
 
@@ -78,7 +79,7 @@ export async function deletePostById(
 export async function getFeaturedPost(): Promise<IPost[] | null> {
   try {
     const foundPosts = postsCollection
-      .find({
+      .find<IPost>({
         featured: true,
       })
       .sort({ createdAt: -1 })
@@ -162,7 +163,7 @@ export async function unFeaturedPost(
 
 export async function getPosts(): Promise<IPost[]> {
   try {
-    const posts = postsCollection.find({}).sort({ createdAt: -1 })
+    const posts = postsCollection.find<IPost>({}).sort({ createdAt: -1 })
     return posts.toArray()
   } catch (error) {
     console.error('error', getPosts.name)

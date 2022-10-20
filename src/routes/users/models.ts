@@ -1,4 +1,4 @@
-import { Collection, ObjectID } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 import { purgeUserList } from 'routes/lists/models'
 import { IUser } from 'types'
 
@@ -17,7 +17,7 @@ export async function addUser(user: IUser): Promise<boolean> {
       role: 'user',
       createdAt: Date.now(),
     })
-    return newUser.result.n === 1
+    return newUser.insertedId ? true : false
   } catch (error) {
     return false
   }
@@ -27,7 +27,7 @@ export async function findUserByUsername(
   username: string
 ): Promise<IUser | null> {
   try {
-    const isUser = await users.findOne({
+    const isUser = await users.findOne<IUser>({
       username,
     })
     return isUser || null
@@ -50,7 +50,7 @@ export async function setPrivilege(
       }
     )
 
-    if (isUser.result.n === 1) {
+    if (isUser.upsertedId) {
       return true
     }
     return false
@@ -62,7 +62,7 @@ export async function setPrivilege(
 export async function getAllUsers(): Promise<IUser[] | null> {
   try {
     const isUser = await users
-      .find(
+      .find<IUser>(
         {},
         {
           projection: {
@@ -108,7 +108,7 @@ export async function findUser(user: IUser): Promise<IUser | null> {
   try {
     const { username, password } = user
 
-    const isUser = await users.findOne(
+    const isUser = await users.findOne<IUser>(
       {
         username,
         password,
@@ -126,8 +126,8 @@ export async function findUser(user: IUser): Promise<IUser | null> {
 }
 export async function findUserById(id: string): Promise<IUser | null> {
   try {
-    const isUser = await users.findOne(
-      { _id: new ObjectID(id) },
+    const isUser = await users.findOne<IUser>(
+      { _id: new ObjectId(id) },
       {
         projection: {
           password: 0,
@@ -166,7 +166,7 @@ export async function changeUserPassword(
       { username, password },
       { $set: { password: newPassword } }
     )
-    return hasPasswordChange.result.n === 1
+    return hasPasswordChange.upsertedId ? true : false
   } catch (error) {
     return false
   }
@@ -186,7 +186,7 @@ export async function changeAvatar(
       }
     )
 
-    if (isUser.result.n === 1) {
+    if (isUser.upsertedId) {
       return true
     }
     return false

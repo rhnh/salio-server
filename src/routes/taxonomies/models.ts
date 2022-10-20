@@ -1,5 +1,5 @@
 import { IList, ISalioResponse, ITaxonomy } from 'types'
-import { Collection, ObjectId, ObjectID } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 
 import slugify from 'slugify'
 import {
@@ -27,11 +27,11 @@ export async function create(
       ...taxonomy,
       isApproved: false,
       createdAt: Date.now(),
+      _id: new ObjectId(),
     })
-    if (hasItem.result.n === 1) {
+    if (hasItem.insertedId) {
       return {
         done: true,
-        data: hasItem.insertedId,
       }
     }
     return {
@@ -69,7 +69,7 @@ export async function update({
         },
       }
     )
-    if (hasItem.result.n === 1) {
+    if (hasItem.upsertedId) {
       return {
         done: true,
       }
@@ -92,7 +92,7 @@ export async function setApprove(id: string): Promise<boolean> {
       { _id: new ObjectId(id) },
       { $set: { isApproved: true } }
     )
-    return (await hasItem.result.n) === 1
+    return hasItem.upsertedId ? true : false
   } catch (nn) {
     return false
   }
@@ -100,7 +100,7 @@ export async function setApprove(id: string): Promise<boolean> {
 export async function delTaxById(id: string): Promise<boolean> {
   try {
     const hasItem = await taxonomies.deleteOne({ _id: new ObjectId(id) })
-    return (await hasItem.result.n) === 1
+    return hasItem.deletedCount === 1
   } catch (nn) {
     return false
   }
@@ -111,10 +111,10 @@ export async function getByUser({
   listName,
 }: IList): Promise<ITaxonomy[] | []> {
   try {
-    const birds = await taxonomies.aggregate(
+    const birds = await taxonomies.aggregate<ITaxonomy>(
       getByUserPipeLine({ username, listName })
     )
-    return await birds.toArray()
+    return (await birds.toArray()) as ITaxonomy[]
   } catch (error) {
     console.error('something went wrong', getByUser.name, error)
     return []
@@ -128,7 +128,7 @@ export async function getByParent({
   try {
     const t = new RegExp(parent, 'i')
 
-    const birds = taxonomies.find({
+    const birds = taxonomies.find<ITaxonomy>({
       parent: t,
       isApproved: true,
     })
@@ -144,7 +144,7 @@ export async function getByTaxonomyName(
 ): Promise<ITaxonomy[] | null> {
   const t = new RegExp(taxonomyName, 'i')
   try {
-    const isTaxonomy = await taxonomies.find({
+    const isTaxonomy = taxonomies.find<ITaxonomy>({
       taxonomyName: { $regex: t },
       isApproved: true,
     })
@@ -170,7 +170,7 @@ export async function addSpecies(
       slug,
       createAt: Date.now(),
     })
-    return isTaxonomy.insertedId
+    return isTaxonomy.insertedId.toString()
   } catch (error) {
     console.error('error', addSpecies.name)
     return ''
@@ -187,7 +187,7 @@ export async function removeUnApprove(id: string): Promise<boolean> {
 
 export async function get(): Promise<ITaxonomy[]> {
   try {
-    const isTaxonomy = taxonomies.find({
+    const isTaxonomy = taxonomies.find<ITaxonomy>({
       isApproved: true,
     })
     // .project({
@@ -204,7 +204,7 @@ export async function get(): Promise<ITaxonomy[]> {
 
 export async function getSpecies(): Promise<ITaxonomy[]> {
   try {
-    const isTaxonomy = taxonomies.find({
+    const isTaxonomy = taxonomies.find<ITaxonomy>({
       isApproved: true,
       englishName: { $ne: null },
       rank: /species/i,
@@ -221,7 +221,7 @@ export async function getById(_id: string): Promise<ITaxonomy | null> {
   try {
     const isTaxonomy = await taxonomies.findOne({
       // isApproved: true,
-      _id: new ObjectID(_id),
+      _id: new ObjectId(_id),
     })
     return (isTaxonomy as unknown) as ITaxonomy
   } catch (error) {
@@ -237,7 +237,7 @@ export async function getByApprovedSpecies(
   const t = new RegExp(taxonomyName, 'i')
   const e = new RegExp(englishName, 'i')
   try {
-    const isTaxonomy = await taxonomies.findOne({
+    const isTaxonomy = await taxonomies.findOne<ITaxonomy>({
       englishName: e,
       taxonomyName: t,
       isApproved: true,
@@ -251,7 +251,7 @@ export async function getByApprovedSpecies(
 export async function getNames(): Promise<ITaxonomy[] | null> {
   try {
     const isTaxonomy = taxonomies
-      .find({
+      .find<ITaxonomy>({
         isApproved: true,
       })
       .project({
@@ -260,7 +260,7 @@ export async function getNames(): Promise<ITaxonomy[] | null> {
         username: 1,
       })
 
-    return isTaxonomy.toArray()
+    return (await isTaxonomy.toArray()) as ITaxonomy[]
   } catch (error) {
     console.error('error', getByApprovedSpecies.name)
     return null
