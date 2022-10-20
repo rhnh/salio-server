@@ -1,4 +1,4 @@
-import { Collection, ObjectID } from 'mongodb'
+import { Collection, ObjectId, ObjectID } from 'mongodb'
 
 import { INotifications } from './types'
 
@@ -16,13 +16,14 @@ export async function addNotification(prop: INotifications): Promise<boolean> {
     } catch (err) {
       return false
     }
+
     const n: INotifications = {
       ...prop,
       createdAt: Date.now(),
     }
 
-    const newNot = await notifications.insertOne(n)
-    return newNot.result.n === 1
+    const newNot = notifications.insertOne({ _id: Object(), ...n })
+    return (await newNot).insertedId ? true : false
   } catch (error) {
     return false
   }
@@ -44,7 +45,7 @@ export async function setActiveById(
         },
       }
     )
-    return update.result.n === 1
+    return update.upsertedCount === 1
   } catch (error) {
     throw new Error(setActiveById.name)
   }
@@ -52,7 +53,7 @@ export async function setActiveById(
 
 export async function getNotifications(): Promise<INotifications[]> {
   try {
-    const n = await notifications.find({}).sort({
+    const n = await notifications.find<INotifications>({}).sort({
       createdAt: 1,
     })
     return await n.toArray()
@@ -64,7 +65,7 @@ export async function getNotifications(): Promise<INotifications[]> {
 export async function getById(id: string): Promise<INotifications | null> {
   try {
     const i = await notifications.findOne<INotifications>({
-      _id: new ObjectID(id),
+      _id: new ObjectId(id),
     })
     return i
   } catch (error) {
@@ -84,7 +85,7 @@ export async function getActive(): Promise<INotifications | null> {
 export async function deleteById(id: string): Promise<boolean> {
   try {
     const i = await notifications.deleteOne({
-      _id: new ObjectID(id),
+      _id: new ObjectId(id),
     })
     return i.deletedCount === 1
   } catch (error) {

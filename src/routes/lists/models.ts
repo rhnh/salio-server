@@ -1,4 +1,4 @@
-import { Collection, Cursor, ObjectId } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 import slugify from 'slugify'
 import { IList } from 'types'
 let lists: Collection
@@ -20,7 +20,7 @@ export async function create({ username, listName }: IList): Promise<boolean> {
       slug: slugify(listName),
       createdAt: Date.now(),
     })
-    return newList.result.n === 1
+    return !!newList.insertedId
   } catch (error) {
     return false
   }
@@ -36,7 +36,7 @@ export async function getListByName({
   listName,
 }: IList): Promise<IList | null> {
   try {
-    const hasList = await lists.findOne({
+    const hasList = await lists.findOne<IList>({
       username,
       slug: listName.toLowerCase(),
     })
@@ -56,7 +56,7 @@ export async function getListBySlug({
   listName,
 }: IList): Promise<IList | null> {
   try {
-    const hasList = await lists.findOne({ username, slug: listName })
+    const hasList = await lists.findOne<IList>({ username, slug: listName })
     return hasList
   } catch (error) {
     return null
@@ -71,7 +71,7 @@ export async function getListByID({
   _id: string
 }): Promise<IList | null> {
   try {
-    const hasList = await lists.findOne({ username, _id })
+    const hasList = await lists.findOne<IList>({ username, _id })
     return hasList
   } catch (error) {
     return null
@@ -93,7 +93,7 @@ export async function getTotalItems({
   }
 }
 
-export async function getListItems(param: IList): Promise<Cursor> {
+export async function getListItems(param: IList): Promise<any> {
   const { username, listName } = param
   try {
     const listItems = lists?.aggregate([
@@ -185,7 +185,7 @@ export async function updateById({
       }
     )
 
-    return hasUpdatedList.result.n === 1
+    return hasUpdatedList.upsertedCount === 1
   } catch (error) {
     return false
   }
@@ -210,7 +210,7 @@ export async function updateBySlug({
       }
     )
 
-    return hasUpdatedList.result.n === 1
+    return hasUpdatedList.upsertedCount === 1
   } catch (error) {
     return false
   }
@@ -222,7 +222,7 @@ export async function deleteUserListName({
 }: IList): Promise<boolean> {
   try {
     const hasDeletedList = await lists.deleteOne({ username, slug: listName })
-    return hasDeletedList.result.n === 1
+    return hasDeletedList.deletedCount === 1
   } catch (error) {
     return false
   }
@@ -239,7 +239,7 @@ export async function deleteListById({
       slug: slugify(listName),
       username,
     })
-    return hasDeletedList.result.n === 1
+    return hasDeletedList.deletedCount === 1
   } catch (error) {
     return false
   }
@@ -247,7 +247,7 @@ export async function deleteListById({
 export async function purgeUserList(username: string): Promise<boolean> {
   try {
     const hasDeleteAll = await lists.deleteMany({ username })
-    return (await hasDeleteAll.result.n) === 1
+    return hasDeleteAll.deletedCount === 1
   } catch (error) {
     return false
   }
@@ -260,7 +260,7 @@ export async function getListsByUsername({
 }): Promise<IList[] | null> {
   try {
     const allLists = await lists
-      .find(
+      .find<IList>(
         { username },
         {
           projection: {
@@ -407,7 +407,7 @@ export async function getUsersBirdIds(username: string): Promise<string[]> {
         },
       ])
       .toArray()
-    const ids: string[] = birdIds as string[]
+    const ids: string[] = birdIds.flatMap((e) => e)
     const values = ids.map((id) => Object.values(id)) || []
     const result = values.flat()
     return result
@@ -418,7 +418,9 @@ export async function getUsersBirdIds(username: string): Promise<string[]> {
 
 export async function deleteById(listId: string): Promise<boolean> {
   try {
-    return (await lists.deleteOne({ _id: new ObjectId(listId) })).result.n === 1
+    return (
+      (await lists.deleteOne({ _id: new ObjectId(listId) })).deletedCount === 1
+    )
   } catch (error) {
     return false
   }
